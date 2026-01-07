@@ -1,16 +1,28 @@
 import axiosInstance from "../../api/axiosInstance";
 
 export const loginAPI = (data) => {
-  const res = axiosInstance.post("/auth/login", data);
-  return res;
+  try {
+    const res = axiosInstance.post("/auth/login", data);
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const signupAPI = (data) => {
-  const res = axiosInstance.post("/auth/signup", data);
-  return res;
+  try {
+    const res = axiosInstance.post("/auth/signup", data);
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const logoutAPI = () => {
-  const res = axiosInstance.post("/auth/logout");
-  return res;
+  try {
+    const res = axiosInstance.post("/auth/logout");
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
 };

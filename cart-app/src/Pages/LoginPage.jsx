@@ -7,6 +7,7 @@ import { login } from "../features/auth/authSlice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 const LoginPage = () => {
   const [user, setUser] = useState({ email: "", password: "" });
@@ -29,6 +30,10 @@ const LoginPage = () => {
       toast.error(err || "Login failed");
     }
   };
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <section className="min-h-screen bg-gray-50 flex items-center">

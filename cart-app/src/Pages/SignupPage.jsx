@@ -7,6 +7,7 @@ import { signup } from "../features/auth/authSlice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     userName: "",
@@ -35,6 +36,10 @@ const SignupPage = () => {
       toast.error(err || "Signup failed");
     }
   };
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <section className="min-h-screen bg-gray-50 flex items-center">
@@ -130,7 +135,7 @@ const SignupPage = () => {
 
               {/* CTA */}
               <button className="w-full bg-red-500 text-white py-2.5 rounded-lg font-semibold hover:bg-red-600 transition">
-                {loading ? "Creating account..." : "Create Account"}
+                Create Account
               </button>
 
               {error && <p className="text-red-500 mt-4">{error}</p>}

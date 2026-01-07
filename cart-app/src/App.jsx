@@ -13,6 +13,7 @@ import ProductDetailPage from "./components/ProductDetailPage";
 import ContactPage from "./Pages/ContactPage";
 import AboutPage from "./Pages/AboutPage";
 import PageNotFound from "./Pages/PageNotFound";
+import Loader from "./components/Loader";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="*" element={<PageNotFound />} />
+          <Route path="/load" element={<Loader />} />
         </Routes>
       </BrowserRouter>
     </Provider>

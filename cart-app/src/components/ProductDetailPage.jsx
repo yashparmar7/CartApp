@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   RiShoppingCartFill,
   RiHeartLine,
@@ -8,55 +8,92 @@ import {
 } from "react-icons/ri";
 import { FaStar } from "react-icons/fa";
 import Navbar from "../components/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import { getSingleProduct } from "../features/product/productSlice";
+import { addToCart } from "../features/cart/cartSlice";
+import { useParams } from "react-router-dom";
+import Loader from "./Loader";
+import { toast } from "react-hot-toast";
 
 const ProductDetailPage = () => {
-  const price = 16000;
-  const mrp = 19999;
-  const discount = Math.round(((mrp - price) / mrp) * 100);
+  const dispatch = useDispatch();
+  const { id } = useParams();
+
+  const { singleProduct, loading, error } = useSelector(
+    (state) => state.product
+  );
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getSingleProduct(id));
+    }
+  }, [dispatch, id]);
+
+  const handleAddToCart = (id) => {
+    dispatch(addToCart({ productId: id }))
+      .unwrap()
+      .then(() => {
+        toast.success("Product added to cart successfully!");
+      })
+      .catch((err) => {
+        toast.error(err);
+      });
+    console.log("Product added to cart:", id);
+  };
+
+  if (loading) return <Loader />;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!singleProduct?._id) return null;
+
+  const price = singleProduct.pricing?.price;
+  const mrp = singleProduct.pricing?.mrp;
+  const discount = singleProduct.pricing?.discountPercentage;
 
   return (
     <>
       <Navbar />
-      <section className="bg-gray-50 py-10">
-        <div className="container mx-auto px-5">
-          <div className="bg-white rounded-xl shadow-lg p-6 lg:p-10">
+
+      <section className="bg-gray-50 py-6 sm:py-10">
+        <div className="container mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex flex-wrap">
               {/* Image */}
-              <div className="lg:w-1/2 w-full">
+              <div className="w-full lg:w-1/2">
                 <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4QaRqKWxfrGdQ9r5U5mWg-RWItNxzmphX-Q&s"
-                  alt="product"
-                  className="w-full h-80 lg:h-[420px] object-cover rounded-lg"
+                  src={singleProduct.image?.[0]}
+                  alt={singleProduct.title}
+                  className="w-full h-72 lg:h-96 object-cover rounded-lg"
                 />
               </div>
 
               {/* Details */}
-              <div className="lg:w-1/2 w-full lg:pl-10 mt-6 lg:mt-0">
+              <div className="w-full lg:w-1/2 lg:pl-10 mt-6 lg:mt-0">
                 <h2 className="text-sm text-gray-500 uppercase mb-1">
-                  Brand Name
+                  {singleProduct.brand}
                 </h2>
 
-                <h1 className="text-2xl lg:text-3xl font-semibold text-gray-900 mb-2">
-                  Running Shoes for Men | Lightweight & Comfortable
+                <h1 className="text-2xl lg:text-3xl font-semibold mb-2">
+                  {singleProduct.title}
                 </h1>
 
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="flex items-center gap-1 bg-green-600 text-white px-2 py-0.5 rounded text-sm font-medium">
-                    4.3 <FaStar className="text-xs" />
+                  <span className="flex items-center gap-1 bg-green-600 text-white px-2 py-0.5 rounded text-sm">
+                    {singleProduct.ratings?.average || 0}
+                    <FaStar className="text-xs" />
                   </span>
                   <span className="text-gray-500 text-sm">
-                    128 ratings & 34 reviews
+                    {singleProduct.ratings?.count || 0} ratings
                   </span>
                 </div>
 
                 {/* Price */}
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-3xl font-bold text-gray-900">
-                    ₹{price.toLocaleString()}
+                  <span className="text-3xl font-bold">
+                    ₹{price?.toLocaleString()}
                   </span>
                   <span className="text-lg text-gray-400 line-through">
-                    ₹{mrp.toLocaleString()}
+                    ₹{mrp?.toLocaleString()}
                   </span>
                   <span className="text-lg text-green-600 font-semibold">
                     {discount}% off
@@ -70,33 +107,35 @@ const ProductDetailPage = () => {
                 {/* Offers */}
                 <div className="mb-6">
                   <h3 className="font-semibold mb-2">Available Offers</h3>
-                  <ul className="space-y-2 text-sm text-gray-700">
-                    <li className="flex items-center gap-2">
-                      <RiPriceTag3Fill className="text-green-600" />
-                      Bank Offer: 10% off on HDFC Credit Cards
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <RiPriceTag3Fill className="text-green-600" />
-                      Special Price: Extra ₹2000 off
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <RiPriceTag3Fill className="text-green-600" />
-                      Free delivery on orders above ₹499
-                    </li>
+                  <ul className="space-y-2 text-sm">
+                    {singleProduct.offers?.map((offer, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <RiPriceTag3Fill className="text-green-600" />
+                        {offer}
+                      </li>
+                    ))}
                   </ul>
                 </div>
 
                 {/* Delivery */}
-                <div className="flex items-center gap-2 mb-6 text-sm text-gray-700">
+                <div className="flex items-center gap-2 mb-6 text-sm">
                   <RiTruckLine className="text-green-600" />
-                  Delivery by <span className="font-medium">
-                    Tomorrow
-                  </span> | <span className="text-green-600">Free</span>
+                  Delivery in{" "}
+                  <span className="font-medium">
+                    {singleProduct.delivery?.estimated}
+                  </span>{" "}
+                  |{" "}
+                  <span className="text-green-600">
+                    {singleProduct.delivery?.cost}
+                  </span>
                 </div>
 
                 {/* CTA */}
-                <div className="flex gap-4 mt-6">
-                  <button className="flex-1 flex items-center justify-center gap-2 bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition">
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  <button
+                    className="flex-1 flex items-center justify-center gap-2 bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition"
+                    onClick={() => handleAddToCart(id)}
+                  >
                     <RiShoppingCartFill />
                     Add to Cart
                   </button>
@@ -106,18 +145,19 @@ const ProductDetailPage = () => {
                     Buy Now
                   </button>
 
-                  <button className="w-12 h-12 rounded-full border flex items-center justify-center hover:bg-gray-100">
-                    <RiHeartLine size={22} />
+                  <button className="w-full sm:w-12 h-12 rounded-lg sm:rounded-full border flex items-center justify-center hover:bg-gray-100">
+                    <RiHeartLine
+                      size={22}
+                      className="text-gray-600 hover:text-red-500"
+                    />
                   </button>
                 </div>
 
                 {/* Description */}
                 <div className="mt-8">
                   <h3 className="font-semibold mb-2">Product Description</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Comfortable and durable running shoes designed for everyday
-                    wear. Lightweight sole, breathable material, and modern
-                    design make it perfect for sports and casual use.
+                  <p className="text-gray-600 text-sm">
+                    {singleProduct.description}
                   </p>
                 </div>
               </div>

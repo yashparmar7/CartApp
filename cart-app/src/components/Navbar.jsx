@@ -41,7 +41,7 @@ const Navbar = () => {
               <path d="M2 17l10 5 10-5" />
               <path d="M2 12l10 5 10-5" />
             </svg>
-            <span className="ml-3 text-xl">Cart App</span>
+            <span className="ml-3 text-xl">CartApp</span>
           </Link>
 
           <nav className="hidden md:flex md:items-center md:ml-auto md:mr-auto font-semibold">

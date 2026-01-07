@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signupAPI, loginAPI, logoutAPI } from "./authAPI";
 
-// Signup thunk
 export const signup = createAsyncThunk(
   "auth/signup",
   async (data, { rejectWithValue }) => {
@@ -14,7 +13,6 @@ export const signup = createAsyncThunk(
   }
 );
 
-// Login thunk
 export const login = createAsyncThunk(
   "auth/login",
   async (data, { rejectWithValue }) => {
@@ -27,12 +25,10 @@ export const login = createAsyncThunk(
   }
 );
 
-// Logout thunk
 export const logoutAsync = createAsyncThunk("auth/logout", async () => {
   try {
     await logoutAPI();
   } catch (error) {
-    // Even if logout API fails, we still want to clear local state
     console.warn("Logout API failed:", error);
   }
 });

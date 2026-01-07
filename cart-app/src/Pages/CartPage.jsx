@@ -1,47 +1,41 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import { IoCartSharp } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { getCart, removeFromCart } from "../features/cart/cartSlice";
+import Loader from "../components/Loader";
 
 const CartPage = () => {
-  // temporary dummy data (later from Redux / backend)
-  const cartItems = [
-    {
-      id: 1,
-      name: "Shoes",
-      price: 1999,
-      qty: 1,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4QaRqKWxfrGdQ9r5U5mWg-RWItNxzmphX-Q&s",
-    },
-    {
-      id: 2,
-      name: "Smart Watch",
-      price: 2999,
-      qty: 2,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4QaRqKWxfrGdQ9r5U5mWg-RWItNxzmphX-Q&s",
-    },
-  ];
+  const dispatch = useDispatch();
+
+  const { cart, loading } = useSelector((state) => state.cart);
+
+  const cartItems = cart || [];
+
+  useEffect(() => {
+    dispatch(getCart());
+  }, [dispatch]);
 
   const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.qty,
+    (acc, item) => acc + item.product.pricing.price * item.quantity,
     0
   );
+
+  if (loading) return <Loader />;
 
   return (
     <>
       <Navbar />
+
       <section className="min-h-screen bg-gray-50 py-16">
         <div className="container mx-auto px-5">
-          <h1 className="flex items-center gap-2 text-3xl font-bold text-gray-900 mb-8">
-            <span>Shopping Cart</span>
-            <IoCartSharp className="text-red-500 text-3xl" />
+          <h1 className="flex items-center gap-2 text-3xl font-bold mb-8">
+            Shopping Cart <IoCartSharp className="text-red-500" />
           </h1>
 
           {cartItems.length === 0 ? (
-            /* Empty Cart */
             <div className="bg-white rounded-xl shadow p-10 text-center">
               <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
               <p className="text-gray-500">
@@ -54,42 +48,49 @@ const CartPage = () => {
               <div className="lg:col-span-2 space-y-6">
                 {cartItems.map((item) => (
                   <div
-                    key={item.id}
+                    key={item.product._id}
                     className="bg-white rounded-xl shadow p-4 flex gap-4"
                   >
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.product.image?.[0]}
+                      alt={item.product.title}
                       className="w-24 h-24 object-cover rounded-lg"
                     />
 
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">
-                        {item.name}
-                      </h3>
-                      <p className="text-red-500 font-medium">₹{item.price}</p>
+                      <h3 className="font-semibold">{item.product.title}</h3>
+                      <p className="text-red-500 font-medium">
+                        ₹{item.product.pricing.price}
+                      </p>
 
-                      {/* Quantity Controls */}
+                      {/* Quantity */}
                       <div className="flex items-center gap-3 mt-3">
-                        <button className="p-1 border rounded hover:bg-gray-100">
+                        <button className="p-1 border rounded">
                           <FiMinus />
                         </button>
-                        <span className="font-medium">{item.qty}</span>
-                        <button className="p-1 border rounded hover:bg-gray-100">
+                        <span className="font-medium">{item.quantity}</span>
+                        <button className="p-1 border rounded">
                           <FiPlus />
                         </button>
                       </div>
                     </div>
 
                     {/* Remove */}
-                    <button className="text-red-500 hover:text-red-600">
+                    <button
+                      onClick={() =>
+                        dispatch(
+                          removeFromCart({ productId: item.product._id })
+                        )
+                      }
+                      className="text-red-500"
+                    >
                       <RiDeleteBin6Line size={20} />
                     </button>
                   </div>
                 ))}
               </div>
 
-              {/* Price Summary */}
+              {/* Summary */}
               <div className="bg-white rounded-xl shadow p-6 h-fit">
                 <h2 className="text-xl font-semibold mb-4">Price Details</h2>
 
@@ -110,7 +111,7 @@ const CartPage = () => {
                   <span>₹{subtotal}</span>
                 </div>
 
-                <button className="w-full mt-6 bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition">
+                <button className="w-full mt-6 bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600">
                   Proceed to Checkout
                 </button>
               </div>
