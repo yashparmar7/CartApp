@@ -46,10 +46,37 @@ const removeFromCart = async (req, res) => {
       (product) => product.product.toString() !== productId
     );
     await cart.save();
-    res.status(200).json({ message: "Product removed from cart successfully" });
+    const populatedCart = await cart.populate("products.product");
+    res.status(200).json({
+      message: "Product removed from cart successfully",
+      products: populatedCart.products,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { getCart, addToCart, removeFromCart };
+const updateQuantity = async (req, res) => {
+  const { productId, quantity } = req.body;
+  try {
+    const cart = await Cart.findOne({ user: req.userId });
+    const productIndex = cart.products.findIndex(
+      (product) => product.product.toString() === productId
+    );
+    if (productIndex !== -1) {
+      cart.products[productIndex].quantity = quantity;
+      await cart.save();
+      const populatedCart = await cart.populate("products.product");
+      res.status(200).json({
+        message: "Quantity updated successfully",
+        products: populatedCart.products,
+      });
+    } else {
+      res.status(404).json({ message: "Product not found in cart" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getCart, addToCart, removeFromCart, updateQuantity };

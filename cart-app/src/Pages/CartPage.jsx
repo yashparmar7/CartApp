@@ -4,19 +4,43 @@ import { FiPlus, FiMinus } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import { IoCartSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
-import { getCart, removeFromCart } from "../features/cart/cartSlice";
+import {
+  getCart,
+  removeFromCart,
+  updateQuantity,
+} from "../features/cart/cartSlice";
 import Loader from "../components/Loader";
 
 const CartPage = () => {
   const dispatch = useDispatch();
 
-  const { cart, loading } = useSelector((state) => state.cart);
-
+  const { cart, loading, error } = useSelector((state) => state.cart);
   const cartItems = cart || [];
 
   useEffect(() => {
     dispatch(getCart());
   }, [dispatch]);
+
+  // ✅ Quantity handlers
+  const handleIncrement = (productId, currentQty) => {
+    dispatch(
+      updateQuantity({
+        productId,
+        quantity: currentQty + 1,
+      })
+    );
+  };
+
+  const handleDecrement = (productId, currentQty) => {
+    if (currentQty <= 1) return;
+
+    dispatch(
+      updateQuantity({
+        productId,
+        quantity: currentQty - 1,
+      })
+    );
+  };
 
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.product.pricing.price * item.quantity,
@@ -34,6 +58,12 @@ const CartPage = () => {
           <h1 className="flex items-center gap-2 text-3xl font-bold mb-8">
             Shopping Cart <IoCartSharp className="text-red-500" />
           </h1>
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {error}
+            </div>
+          )}
 
           {cartItems.length === 0 ? (
             <div className="bg-white rounded-xl shadow p-10 text-center">
@@ -65,11 +95,28 @@ const CartPage = () => {
 
                       {/* Quantity */}
                       <div className="flex items-center gap-3 mt-3">
-                        <button className="p-1 border rounded">
+                        <button
+                          onClick={() =>
+                            handleDecrement(item.product._id, item.quantity)
+                          }
+                          disabled={item.quantity <= 1}
+                          className={`p-1 border rounded ${
+                            item.quantity <= 1
+                              ? "opacity-50 cursor-not-allowed"
+                              : "hover:bg-gray-100"
+                          }`}
+                        >
                           <FiMinus />
                         </button>
+
                         <span className="font-medium">{item.quantity}</span>
-                        <button className="p-1 border rounded">
+
+                        <button
+                          onClick={() =>
+                            handleIncrement(item.product._id, item.quantity)
+                          }
+                          className="p-1 border rounded hover:bg-gray-100"
+                        >
                           <FiPlus />
                         </button>
                       </div>
@@ -79,10 +126,12 @@ const CartPage = () => {
                     <button
                       onClick={() =>
                         dispatch(
-                          removeFromCart({ productId: item.product._id })
+                          removeFromCart({
+                            productId: item.product._id,
+                          })
                         )
                       }
-                      className="text-red-500"
+                      className="text-red-500 hover:text-red-600"
                     >
                       <RiDeleteBin6Line size={20} />
                     </button>

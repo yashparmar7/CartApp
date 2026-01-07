@@ -11,6 +11,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const { cart } = useSelector((state) => state.cart);
 
   const handleLogout = () => {
     dispatch(logoutAsync());
@@ -65,9 +66,11 @@ const Navbar = () => {
               className="relative bg-gray-100 p-2 rounded hover:bg-gray-200"
             >
               <IoCart className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
-                2
-              </span>
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                  {cart.length}
+                </span>
+              )}
             </Link>
             <button
               onClick={() => setOpen(true)}

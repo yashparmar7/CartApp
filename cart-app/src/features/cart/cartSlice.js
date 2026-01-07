@@ -1,5 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCartAPI, addToCartAPI, removeFromCartAPI } from "./cartAPI";
+import {
+  getCartAPI,
+  addToCartAPI,
+  removeFromCartAPI,
+  updateQuantityAPI,
+} from "./cartAPI";
 
 export const getCart = createAsyncThunk(
   "cart/getCart",
@@ -38,6 +43,20 @@ export const removeFromCart = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to remove from cart"
+      );
+    }
+  }
+);
+
+export const updateQuantity = createAsyncThunk(
+  "cart/updateQuantity",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await updateQuantityAPI(data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update quantity"
       );
     }
   }
@@ -90,6 +109,19 @@ const cartSlice = createSlice({
         state.cart = action.payload.products;
       })
       .addCase(removeFromCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(updateQuantity.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateQuantity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cart = action.payload.products;
+      })
+      .addCase(updateQuantity.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
