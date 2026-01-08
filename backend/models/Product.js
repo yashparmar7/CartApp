@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
   {
+    // BASIC INFO
     title: {
       type: String,
       required: true,
@@ -28,6 +29,14 @@ const productSchema = new mongoose.Schema(
       },
     ],
 
+    // SELLER
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SellerRequest",
+      required: true,
+    },
+
+    // PRICING
     pricing: {
       price: {
         type: Number,
@@ -43,6 +52,7 @@ const productSchema = new mongoose.Schema(
       },
     },
 
+    // RATINGS
     ratings: {
       average: {
         type: Number,
@@ -56,8 +66,10 @@ const productSchema = new mongoose.Schema(
       },
     },
 
+    // OFFERS
     offers: [String],
 
+    // DELIVERY
     delivery: {
       estimated: {
         type: String,
@@ -67,17 +79,41 @@ const productSchema = new mongoose.Schema(
         type: String,
         default: "Free",
       },
+      codAvailable: {
+        type: Boolean,
+        default: true,
+      },
     },
 
+    // CATEGORY
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
 
+    // INVENTORY
     stock: {
       type: Number,
       default: 0,
+    },
+
+    // ANALYTICS
+    ordersCount: {
+      type: Number,
+      default: 0,
+    },
+
+    soldCount: {
+      type: Number,
+      default: 0,
+    },
+
+    // STATUS & CONTROL
+    status: {
+      type: String,
+      enum: ["DRAFT", "PENDING", "APPROVED", "REJECTED", "BLOCKED"],
+      default: "PENDING",
     },
 
     isActive: {

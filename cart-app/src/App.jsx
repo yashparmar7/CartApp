@@ -10,6 +10,7 @@ import {
   AdminSidebar,
   SellerSidebar,
 } from "./Layout/Sidebars";
+import ProtectRoutes from "./routes/ProtectRoutes";
 
 /* User Pages */
 import HomePage from "./Pages/User/HomePage";
@@ -31,6 +32,7 @@ import SuperAdminDashboard from "./Pages/SuperAdmin/Dashboard";
 import ProductDetailPage from "./components/ProductDetailPage";
 import Loader from "./components/Loader";
 import SellerRequests from "./Pages/Admin/SellerRequests";
+import Products from "./Pages/Admin/Products";
 
 function App() {
   return (
@@ -50,26 +52,44 @@ function App() {
           <Route path="/become-seller" element={<BecomeSeller />} />
 
           {/* ADMIN */}
+          {/* ADMIN */}
           <Route
             path="/admin"
-            element={<DashboardLayout sidebar={AdminSidebar} />}
+            element={
+              <ProtectRoutes allowedRoles={["ADMIN"]}>
+                <DashboardLayout sidebar={AdminSidebar} />
+              </ProtectRoutes>
+            }
           >
             <Route index element={<AdminDashboard />} />
-          </Route>
 
-          <Route path="/admin/getSellerRequests" element={<SellerRequests />} />
+            <Route
+              path="/admin/getSellerRequests"
+              element={<SellerRequests />}
+            />
+
+            <Route path="/admin/products" element={<Products />} />
+          </Route>
 
           {/* SELLER */}
           <Route
             path="/seller"
-            element={<DashboardLayout sidebar={SellerSidebar} />}
+            element={
+              <ProtectRoutes allowedRoles={["SELLER"]}>
+                <DashboardLayout sidebar={SellerSidebar} />
+              </ProtectRoutes>
+            }
           >
             <Route index element={<SellerDashboard />} />
           </Route>
           {/* SUPER ADMIN */}
           <Route
             path="/superadmin"
-            element={<DashboardLayout sidebar={SuperAdminSidebar} />}
+            element={
+              <ProtectRoutes allowedRoles={["SUPERADMIN"]}>
+                <DashboardLayout sidebar={SuperAdminSidebar} />
+              </ProtectRoutes>
+            }
           >
             <Route index element={<SuperAdminDashboard />} />
             {/* later: users, sellers, orders */}

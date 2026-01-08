@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { RiMenu2Line, RiCloseLine } from "react-icons/ri";
+import LogoutButton from "../components/LogoutButton";
 
 const DashboardLayout = ({ sidebar }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -57,6 +58,10 @@ const DashboardLayout = ({ sidebar }) => {
             })
           )}
         </nav>
+
+        <div className="p-3 border-t border-gray-300">
+          <LogoutButton collapsed={collapsed} />
+        </div>
       </aside>
 
       {/* ===== MAIN ===== */}

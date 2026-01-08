@@ -17,3 +17,12 @@ export const getSingleProductAPI = (id) => {
     console.log(err);
   }
 };
+
+export const getAllProductsAdminAPI = () => {
+  try {
+    const res = axiosInstance.get("/admin/getAllProductsAdmin");
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};

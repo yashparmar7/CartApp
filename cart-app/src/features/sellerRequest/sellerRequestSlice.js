@@ -2,12 +2,15 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import {
   getSellerRequestsAPI,
-  updateSellerRequestAPI,
+  approveSellerRequestAPI,
+  rejectSellerRequestAPI,
   createSellerRequestAPI,
+  updateSellerUserRoleAPI,
+  deleteSellerRequestAPI,
 } from "./sellerRequestAPI";
 
-export const getSellerRequests = createAsyncThunk(
-  "sellerRequest/getSellerRequests",
+export const fetchSellerRequests = createAsyncThunk(
+  "sellerRequest/fetchSellerRequests",
   async (_, { rejectWithValue }) => {
     try {
       const res = await getSellerRequestsAPI();
@@ -20,15 +23,29 @@ export const getSellerRequests = createAsyncThunk(
   }
 );
 
-export const updateSellerRequest = createAsyncThunk(
-  "sellerRequest/updateSellerRequest",
-  async ({ id, data }, { rejectWithValue }) => {
+export const approveSellerRequest = createAsyncThunk(
+  "sellerRequest/approveSellerRequest",
+  async (id, { rejectWithValue }) => {
     try {
-      const res = await updateSellerRequestAPI(id, data);
+      const res = await approveSellerRequestAPI(id);
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to update seller request"
+        err.response?.data?.message || "Failed to approve seller request"
+      );
+    }
+  }
+);
+
+export const rejectSellerRequest = createAsyncThunk(
+  "sellerRequest/rejectSellerRequest",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await rejectSellerRequestAPI(id);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to reject seller request"
       );
     }
   }
@@ -48,40 +65,86 @@ export const createSellerRequest = createAsyncThunk(
   }
 );
 
+export const updateSellerUserRole = createAsyncThunk(
+  "sellerRequest/updateSellerUserRole",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const res = await updateSellerUserRoleAPI(id, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update seller role"
+      );
+    }
+  }
+);
+
+export const deleteSellerRequest = createAsyncThunk(
+  "sellerRequest/deleteSellerRequest",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await deleteSellerRequestAPI(id);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete seller request"
+      );
+    }
+  }
+);
+
 const sellerRequestSlice = createSlice({
   name: "sellerRequest",
   initialState: {
-    sellerRequests: [],
+    requests: [],
     loading: false,
     error: null,
   },
   extraReducers: (builder) => {
-    builder.addCase(getSellerRequests.pending, (state) => {
+    builder.addCase(fetchSellerRequests.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(getSellerRequests.fulfilled, (state, action) => {
+    builder.addCase(fetchSellerRequests.fulfilled, (state, action) => {
       state.loading = false;
-      state.sellerRequests = action.payload;
+      state.requests = action.payload;
     });
-    builder.addCase(getSellerRequests.rejected, (state, action) => {
+    builder.addCase(fetchSellerRequests.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
 
-    builder.addCase(updateSellerRequest.pending, (state) => {
+    builder.addCase(approveSellerRequest.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(updateSellerRequest.fulfilled, (state, action) => {
+    builder.addCase(approveSellerRequest.fulfilled, (state, action) => {
       state.loading = false;
       const updatedRequest = action.payload;
-      state.sellerRequests = state.sellerRequests.map((request) => {
+      state.requests = state.requests.map((request) => {
         if (request._id === updatedRequest._id) {
           return updatedRequest;
         }
         return request;
       });
     });
-    builder.addCase(updateSellerRequest.rejected, (state, action) => {
+    builder.addCase(approveSellerRequest.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    builder.addCase(rejectSellerRequest.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(rejectSellerRequest.fulfilled, (state, action) => {
+      state.loading = false;
+      const updatedRequest = action.payload;
+      state.requests = state.requests.map((request) => {
+        if (request._id === updatedRequest._id) {
+          return updatedRequest;
+        }
+        return request;
+      });
+    });
+    builder.addCase(rejectSellerRequest.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
@@ -91,9 +154,40 @@ const sellerRequestSlice = createSlice({
     });
     builder.addCase(createSellerRequest.fulfilled, (state, action) => {
       state.loading = false;
-      state.sellerRequests.push(action.payload);
+      state.requests.push(action.payload);
     });
     builder.addCase(createSellerRequest.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    builder.addCase(updateSellerUserRole.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateSellerUserRole.fulfilled, (state, action) => {
+      state.loading = false;
+      const updatedUser = action.payload;
+
+      state.requests = state.requests.map((req) =>
+        req.user?._id === updatedUser._id ? { ...req, user: updatedUser } : req
+      );
+    });
+
+    builder.addCase(updateSellerUserRole.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    builder.addCase(deleteSellerRequest.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(deleteSellerRequest.fulfilled, (state, action) => {
+      state.loading = false;
+      state.requests = state.requests.filter(
+        (request) => request._id !== action.payload._id
+      );
+    });
+    builder.addCase(deleteSellerRequest.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });

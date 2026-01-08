@@ -2,6 +2,16 @@ const Product = require("../models/Product");
 
 const createProduct = async (req, res) => {
   try {
+    const sellerExists = await SellerRequest.findById(req.body.seller);
+    if (!sellerExists) {
+      return res.status(400).json({ message: "Invalid seller ID" });
+    }
+
+    const categoryExists = await Category.findById(req.body.category);
+    if (!categoryExists) {
+      return res.status(400).json({ message: "Invalid category ID" });
+    }
+
     const product = await Product.create(req.body);
     res.status(201).json({ message: "Product created successfully", product });
   } catch (err) {
@@ -13,13 +23,21 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isActive: true });
-    //   .populate("category")
-    //   .sort({ createdAt: -1 });
+    const products = await Product.find({
+      status: "APPROVED",
+      isActive: true,
+      stock: { $gt: 0 },
+    });
+    // .populate("category", "name")
+    // .sort({ createdAt: -1 });
 
-    res.status(200).json(products);
+    res.status(200).json({
+      success: true,
+      products,
+    });
   } catch (err) {
     res.status(500).json({
+      success: false,
       message: "Error fetching products",
       error: err.message,
     });

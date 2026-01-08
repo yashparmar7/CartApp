@@ -68,7 +68,10 @@ const BecomeSeller = () => {
     const payload = {
       ...form,
       email: user?.email,
+      user: user?.id,
     };
+
+    console.log(payload);
 
     try {
       await dispatch(createSellerRequest(payload)).unwrap();
