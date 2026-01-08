@@ -1,14 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { RiEmotionSadLine, RiArrowRightLine } from "react-icons/ri";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 const PageNotFound = () => {
   return (
     <>
-      <Navbar />
-
       <section className="min-h-[70vh] flex items-center justify-center bg-gray-50">
         <div className="container mx-auto px-5 text-center">
           <div className="flex justify-center mb-4">
@@ -43,8 +39,6 @@ const PageNotFound = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </>
   );
 };

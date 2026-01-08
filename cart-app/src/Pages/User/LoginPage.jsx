@@ -3,37 +3,38 @@ import { Link } from "react-router-dom";
 import { TiTick } from "react-icons/ti";
 import { RiShoppingCartFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import { signup } from "../features/auth/authSlice";
+import { login } from "../../features/auth/authSlice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import Loader from "../components/Loader";
-const SignupPage = () => {
-  const [formData, setFormData] = useState({
-    userName: "",
-    email: "",
-    password: "",
-  });
+import Loader from "../../components/Loader";
+
+const LoginPage = () => {
+  const [user, setUser] = useState({ email: "", password: "" });
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { error, loading } = useSelector((state) => state.auth);
+  const { loading } = useSelector((state) => state.auth);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setUser({ ...user, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(signup(formData)).unwrap();
-      toast.success("Signup successful!");
-      navigate("/");
+      const res = await dispatch(login(user)).unwrap();
+
+      toast.success("Login successful!");
+
+      const role = res?.user?.role;
+
+      if (role === "ADMIN") navigate("/admin");
+      else if (role === "SELLER") navigate("/seller");
+      else if (role === "SUPERADMIN") navigate("/superadmin");
+      else navigate("/");
     } catch (err) {
-      toast.error(err || "Signup failed");
+      toast.error(err || "Login failed");
     }
   };
 
@@ -45,63 +46,46 @@ const SignupPage = () => {
     <section className="min-h-screen bg-gray-50 flex items-center">
       <div className="container mx-auto px-5 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left – Ecommerce Content */}
+          {/* Left – Branding / Benefits */}
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 leading-tight flex items-center gap-2">
-              Create your account & <br />
-              start shopping smarter
+            <h1 className="text-4xl font-bold text-gray-900 leading-tight flex items-center gap-3">
+              Welcome back <br />
+              Let’s continue shopping
               {/* <RiShoppingCartFill className="text-red-500 text-4xl" /> */}
             </h1>
 
             <p className="mt-4 text-gray-600 text-lg">
-              Join our cart app to track orders, save favorites, and get
-              exclusive deals on every purchase.
+              Login to manage your cart, track orders, and grab exclusive deals
+              before they’re gone.
             </p>
 
             <ul className="mt-6 space-y-3 text-gray-700">
               <li className="flex items-center gap-2">
                 <TiTick className="text-green-500 text-xl" />
-                Easy checkout experience
+                Saved cart items
               </li>
               <li className="flex items-center gap-2">
                 <TiTick className="text-green-500 text-xl" />
-                Secure payments
+                Order tracking
               </li>
               <li className="flex items-center gap-2">
                 <TiTick className="text-green-500 text-xl" />
-                Fast order tracking
+                Secure checkout
               </li>
               <li className="flex items-center gap-2">
                 <TiTick className="text-green-500 text-xl" />
-                Exclusive member discounts
+                Members-only offers
               </li>
             </ul>
           </div>
 
-          {/* Right – Signup Card */}
+          {/* Right – Login Card */}
           <form onSubmit={handleSubmit}>
             <div className="bg-white shadow-xl rounded-xl p-8 max-w-md w-full mx-auto">
               <h2 className="text-2xl font-semibold text-gray-900 mb-1">
-                Sign Up
+                Login
               </h2>
-              <p className="text-sm text-gray-500 mb-6">
-                Create your free account
-              </p>
-
-              {/* User Name */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600 mb-1">
-                  User Name
-                </label>
-                <input
-                  type="text"
-                  name="userName"
-                  value={formData.userName}
-                  onChange={handleChange}
-                  placeholder="User Name"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
-                />
-              </div>
+              <p className="text-sm text-gray-500 mb-6">Access your account</p>
 
               {/* Email */}
               <div className="mb-4">
@@ -111,7 +95,6 @@ const SignupPage = () => {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
                   onChange={handleChange}
                   placeholder="abc@example.com"
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
@@ -119,26 +102,37 @@ const SignupPage = () => {
               </div>
 
               {/* Password */}
-              <div className="mb-6">
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-600 mb-1">
                   Password
                 </label>
                 <input
                   type="password"
                   name="password"
-                  value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
                 />
               </div>
 
+              {/* Remember + Forgot */}
+              <div className="flex items-center justify-between mb-6">
+                <label className="flex items-center text-sm text-gray-600">
+                  <input type="checkbox" className="mr-2 accent-red-500" />
+                  Remember me
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-red-500 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
               {/* CTA */}
               <button className="w-full bg-red-500 text-white py-2.5 rounded-lg font-semibold hover:bg-red-600 transition">
-                Create Account
+                {loading ? "Logging in..." : "Login"}
               </button>
-
-              {error && <p className="text-red-500 mt-4">{error}</p>}
 
               {/* Divider */}
               <div className="flex items-center my-6">
@@ -147,14 +141,14 @@ const SignupPage = () => {
                 <div className="flex-1 h-px bg-gray-200" />
               </div>
 
-              {/* Login Link */}
+              {/* Signup Link */}
               <p className="text-sm text-center text-gray-600">
-                Already have an account?{" "}
+                New here?{" "}
                 <Link
-                  to="/login"
+                  to="/signup"
                   className="text-red-500 font-medium hover:underline"
                 >
-                  Login
+                  Create an account
                 </Link>
               </p>
             </div>
@@ -165,4 +159,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default LoginPage;

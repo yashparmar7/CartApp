@@ -1,22 +1,42 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { RiShoppingCartFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllProducts,
   getSingleProduct,
 } from "../features/product/productSlice";
+import { addToCart } from "../features/cart/cartSlice";
+import { selectIsAuthenticated } from "../features/auth/authSlice";
 import Loader from "./Loader";
+import { toast } from "react-hot-toast";
 
 const Card = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { products, loading, error } = useSelector((state) => state.product);
+  const { products, loading } = useSelector((state) => state.product);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
     dispatch(getAllProducts());
   }, [dispatch]);
+
+  const handleAddToCart = (e, id) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      toast.error("Please login to continue");
+      return;
+    }
+
+    dispatch(addToCart({ productId: id }))
+      .unwrap()
+      .then((res) => toast.success(res.message))
+      .catch((err) =>
+        toast.error(err?.message || "Failed to add product to cart")
+      );
+  };
 
   const handleRedirect = (id) => {
     dispatch(getSingleProduct(id));
@@ -36,16 +56,13 @@ const Card = () => {
   };
 
   if (loading) return <Loader />;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-4 py-6 mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
           {products.map((product) => {
-            const price = product.pricing?.price;
-            const mrp = product.pricing?.mrp;
-            const discount = product.pricing?.discountPercentage;
+            const { price, mrp, discountPercentage } = product.pricing || {};
 
             return (
               <div
@@ -87,11 +104,19 @@ const Card = () => {
                       ₹{mrp?.toLocaleString()}
                     </span>
                     <span className="text-green-600 text-sm">
-                      {discount}% off
+                      {discountPercentage}% off
                     </span>
                   </div>
 
                   <p className="text-xs text-green-600">Free Delivery</p>
+
+                  <button
+                    onClick={(e) => handleAddToCart(e, product._id)}
+                    className="w-full mt-2 flex items-center justify-center gap-1 bg-red-500 text-white py-2 rounded text-xs font-medium hover:bg-red-600 transition"
+                  >
+                    <RiShoppingCartFill size={14} />
+                    Add to Cart
+                  </button>
                 </div>
               </div>
             );

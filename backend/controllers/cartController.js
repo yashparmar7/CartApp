@@ -3,8 +3,13 @@ const Cart = require("../models/Cart");
 const addToCart = async (req, res) => {
   const { productId } = req.body;
 
+  if (!productId) {
+    return res.status(400).json({ message: "Product ID is required" });
+  }
+
   try {
     let cart = await Cart.findOne({ user: req.userId });
+    let message = "Product added to cart successfully";
 
     if (!cart) {
       cart = await Cart.create({
@@ -12,14 +17,24 @@ const addToCart = async (req, res) => {
         products: [{ product: productId, quantity: 1 }],
       });
     } else {
-      cart.products.push({ product: productId, quantity: 1 });
+      const existingProduct = cart.products.find(
+        (item) => item.product.toString() === productId
+      );
+
+      if (existingProduct) {
+        existingProduct.quantity += 1;
+        message = "Product already in cart, quantity updated";
+      } else {
+        cart.products.push({ product: productId, quantity: 1 });
+      }
+
       await cart.save();
     }
 
     const populatedCart = await cart.populate("products.product");
 
     res.status(200).json({
-      message: "Product added to cart successfully",
+      message,
       products: populatedCart.products,
     });
   } catch (error) {

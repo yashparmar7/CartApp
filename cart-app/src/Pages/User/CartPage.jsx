@@ -1,20 +1,23 @@
 import React, { useEffect } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiPlus, FiMinus } from "react-icons/fi";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
 import { IoCartSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCart,
   removeFromCart,
   updateQuantity,
-} from "../features/cart/cartSlice";
-import Loader from "../components/Loader";
+} from "../../features/cart/cartSlice";
+import { selectIsAuthenticated } from "../../features/auth/authSlice";
+import Loader from "../../components/Loader";
+import { toast } from "react-hot-toast";
 
 const CartPage = () => {
   const dispatch = useDispatch();
 
   const { cart, loading, error } = useSelector((state) => state.cart);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const cartItems = cart || [];
 
   useEffect(() => {
@@ -47,6 +50,15 @@ const CartPage = () => {
     0
   );
 
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to continue");
+      return;
+    }
+    // Implement checkout logic here
+    toast.success("Proceeding to checkout...");
+  };
+
   if (loading) return <Loader />;
 
   return (
@@ -59,7 +71,7 @@ const CartPage = () => {
             Shopping Cart <IoCartSharp className="text-red-500" />
           </h1>
 
-          {error && (
+          {error && error !== "Access Denied" && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {error}
             </div>
@@ -160,7 +172,10 @@ const CartPage = () => {
                   <span>₹{subtotal}</span>
                 </div>
 
-                <button className="w-full mt-6 bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600">
+                <button
+                  onClick={handleCheckout}
+                  className="w-full mt-6 bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600"
+                >
                   Proceed to Checkout
                 </button>
               </div>

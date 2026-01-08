@@ -7,21 +7,24 @@ import {
   RiPriceTag3Fill,
 } from "react-icons/ri";
 import { FaStar } from "react-icons/fa";
-import Navbar from "../components/Navbar";
+import Navbar from "./Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleProduct } from "../features/product/productSlice";
 import { addToCart } from "../features/cart/cartSlice";
-import { useParams } from "react-router-dom";
+import { selectIsAuthenticated } from "../features/auth/authSlice";
+import { useParams, useNavigate } from "react-router-dom";
 import Loader from "./Loader";
 import { toast } from "react-hot-toast";
 
 const ProductDetailPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams();
 
   const { singleProduct, loading, error } = useSelector(
     (state) => state.product
   );
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
     if (id) {
@@ -30,15 +33,26 @@ const ProductDetailPage = () => {
   }, [dispatch, id]);
 
   const handleAddToCart = (id) => {
+    if (!isAuthenticated) {
+      toast.error("Please login to continue");
+      return;
+    }
     dispatch(addToCart({ productId: id }))
       .unwrap()
-      .then(() => {
-        toast.success("Product added to cart successfully!");
+      .then((res) => {
+        toast.success(res.message);
       })
       .catch((err) => {
-        toast.error(err);
+        toast.error(err?.message || "Failed to add product to cart");
       });
-    console.log("Product added to cart:", id);
+  };
+
+  const handleBuyNow = (id) => {
+    if (!isAuthenticated) {
+      toast.error("Please login to continue");
+      return;
+    }
+    navigate("/cart");
   };
 
   if (loading) return <Loader />;
@@ -140,7 +154,10 @@ const ProductDetailPage = () => {
                     Add to Cart
                   </button>
 
-                  <button className="flex-1 flex items-center justify-center gap-2 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
+                  <button
+                    onClick={() => handleBuyNow(id)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition"
+                  >
                     <RiFlashlightFill />
                     Buy Now
                   </button>

@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "../components/Navbar";
-import Card from "../components/Card";
+import Navbar from "../../components/Navbar";
+import Card from "../../components/Card";
 import {
   RiFlashlightFill,
   RiTruckLine,
@@ -8,9 +8,11 @@ import {
   RiSecurePaymentLine,
   RiArrowRightLine,
 } from "react-icons/ri";
-import heroImage from "../assets/hero-section.png";
-import Footer from "../components/Footer";
+import heroImage from "../../assets/hero-section.png";
+
+import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
   MdPhoneAndroid,
@@ -37,28 +39,45 @@ const HomePage = () => {
     <>
       <Navbar />
 
-      <section className="bg-gradient-to-r from-red-500 to-orange-400 text-white">
-        <div className="container mx-auto px-4 py-8 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold leading-tight mb-3">
-              Smart Shopping <br /> Starts Here
-            </h1>
-            <p className="text-sm sm:text-base lg:text-lg text-white/90 mb-5">
-              Discover top deals, trending products, and secure checkout — all
-              in one place.
-            </p>
+      <section className="relative overflow-hidden bg-gradient-to-br from-red-500 via-red-400 to-orange-400 text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+          <div className="flex flex-col-reverse lg:flex-row items-center gap-10 lg:gap-16">
+            {/* LEFT CONTENT */}
+            <div className="w-full lg:w-1/2 text-center lg:text-left">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold leading-tight tracking-tight mb-5">
+                Smart Shopping
+                <span className="block text-white/95">Starts Here</span>
+              </h1>
 
-            <button className="inline-flex items-center gap-2 bg-white text-red-500 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition">
-              Shop Now <RiArrowRightLine />
-            </button>
-          </div>
+              <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mx-auto lg:mx-0 mb-8">
+                Discover top deals, trending products, and a fast, secure
+                checkout experience — all built for modern shoppers.
+              </p>
 
-          <div className="flex justify-center">
-            <img
-              src={heroImage}
-              alt="ecommerce hero"
-              className="w-full max-w-xs sm:max-w-sm lg:max-w-md"
-            />
+              <div className="flex justify-center lg:justify-start">
+                <Link
+                  to="/shop"
+                  className="inline-flex items-center gap-2 bg-white text-red-600 px-7 py-3.5 rounded-full font-semibold shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all"
+                >
+                  Shop Now
+                  <RiArrowRightLine className="text-lg" />
+                </Link>
+              </div>
+            </div>
+
+            {/* RIGHT IMAGE */}
+            <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
+              <div className="relative">
+                <img
+                  src={heroImage}
+                  alt="Ecommerce Hero"
+                  className="w-[200px] sm:w-[260px] md:w-[320px] lg:w-[420px] xl:w-[480px] drop-shadow-2xl"
+                />
+
+                {/* glow */}
+                <div className="absolute inset-0 -z-10 rounded-full bg-white/20 blur-3xl scale-110" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
