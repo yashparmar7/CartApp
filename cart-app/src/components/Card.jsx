@@ -25,6 +25,7 @@ const Card = () => {
 
   const handleAddToCart = (e, id) => {
     e.stopPropagation();
+
     if (!isAuthenticated) {
       toast.error("Please login to continue");
       return;
@@ -59,8 +60,8 @@ const Card = () => {
 
   return (
     <section className="text-gray-600 body-font">
-      <div className="container px-4 py-6 mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="container mx-auto px-3 sm:px-4 py-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
           {products.map((product) => {
             const { price, mrp, discountPercentage } = product.pricing || {};
 
@@ -68,51 +69,59 @@ const Card = () => {
               <div
                 key={product._id}
                 onClick={() => handleRedirect(product._id)}
-                className="border border-gray-300 rounded-lg p-3 cursor-pointer bg-white hover:shadow-md transition"
+                className="group flex flex-col h-full bg-white border border-gray-200 rounded-xl p-3 sm:p-4 cursor-pointer transition hover:shadow-lg"
               >
-                <div className="relative w-full aspect-square rounded overflow-hidden">
+                {/* Image */}
+                <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100">
                   <img
                     src={product.image?.[0]}
                     alt={product.title}
-                    className="object-cover w-full h-full"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
                 </div>
 
-                <div className="mt-2 space-y-1">
-                  <h3 className="text-xs text-gray-500 uppercase">
+                {/* Content */}
+                <div className="mt-3 flex flex-col flex-1 space-y-1">
+                  <h3 className="text-[10px] sm:text-xs text-gray-500 uppercase truncate">
                     {product.brand}
                   </h3>
 
-                  <h2 className="text-sm font-medium line-clamp-2">
+                  <h2 className="text-sm sm:text-base font-medium line-clamp-2 leading-snug">
                     {product.title}
                   </h2>
 
+                  {/* Rating */}
                   <div className="flex items-center gap-1 text-xs">
                     <div className="flex">
                       {renderStars(product.ratings?.average)}
                     </div>
-                    <span className="text-gray-500">
+                    <span className="text-gray-400">
                       ({product.ratings?.count || 0})
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">
+                  {/* Price */}
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                    <span className="font-semibold text-sm sm:text-base">
                       ₹{price?.toLocaleString()}
                     </span>
-                    <span className="line-through text-gray-400 text-sm">
+                    <span className="line-through text-gray-400 text-xs">
                       ₹{mrp?.toLocaleString()}
                     </span>
-                    <span className="text-green-600 text-sm">
+                    <span className="text-green-600 text-xs font-medium">
                       {discountPercentage}% off
                     </span>
                   </div>
 
-                  <p className="text-xs text-green-600">Free Delivery</p>
+                  <p className="text-[11px] text-green-600">Free Delivery</p>
 
+                  {/* Spacer */}
+                  <div className="flex-1" />
+
+                  {/* Button */}
                   <button
                     onClick={(e) => handleAddToCart(e, product._id)}
-                    className="w-full mt-2 flex items-center justify-center gap-1 bg-red-500 text-white py-2 rounded text-xs font-medium hover:bg-red-600 transition"
+                    className="mt-3 w-full flex items-center justify-center gap-1 bg-red-500 text-white py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-600 active:scale-95 transition"
                   >
                     <RiShoppingCartFill size={14} />
                     Add to Cart

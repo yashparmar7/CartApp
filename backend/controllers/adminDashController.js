@@ -78,7 +78,6 @@ const getAllProductsAdmin = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate("category", "name");
 
-    console.log(products);
     res.status(200).json({
       success: true,
       products,

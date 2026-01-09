@@ -71,8 +71,6 @@ const BecomeSeller = () => {
       user: user?.id,
     };
 
-    console.log(payload);
-
     try {
       await dispatch(createSellerRequest(payload)).unwrap();
       toast.success(

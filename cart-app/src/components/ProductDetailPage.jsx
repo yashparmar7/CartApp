@@ -27,9 +27,7 @@ const ProductDetailPage = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    if (id) {
-      dispatch(getSingleProduct(id));
-    }
+    if (id) dispatch(getSingleProduct(id));
   }, [dispatch, id]);
 
   const handleAddToCart = (id) => {
@@ -37,17 +35,16 @@ const ProductDetailPage = () => {
       toast.error("Please login to continue");
       return;
     }
+
     dispatch(addToCart({ productId: id }))
       .unwrap()
-      .then((res) => {
-        toast.success(res.message);
-      })
-      .catch((err) => {
-        toast.error(err?.message || "Failed to add product to cart");
-      });
+      .then((res) => toast.success(res.message))
+      .catch((err) =>
+        toast.error(err?.message || "Failed to add product to cart")
+      );
   };
 
-  const handleBuyNow = (id) => {
+  const handleBuyNow = () => {
     if (!isAuthenticated) {
       toast.error("Please login to continue");
       return;
@@ -68,30 +65,34 @@ const ProductDetailPage = () => {
       <Navbar />
 
       <section className="bg-gray-50 py-6 sm:py-10">
-        <div className="container mx-auto px-4">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex flex-wrap">
-              {/* Image */}
-              <div className="w-full lg:w-1/2">
-                <img
-                  src={singleProduct.image?.[0]}
-                  alt={singleProduct.title}
-                  className="w-full h-72 lg:h-96 object-fill rounded-lg"
-                />
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* IMAGE */}
+              <div className="w-full flex justify-center">
+                <div className="relative w-full max-w-lg aspect-square rounded-2xl bg-white border border-gray-200 overflow-hidden">
+                  <img
+                    src={singleProduct.image?.[0]}
+                    alt={singleProduct.title}
+                    className="w-full h-full object-contain p-6 transition-transform duration-300 ease-out hover:scale-110"
+                    loading="eager"
+                    draggable={false}
+                  />
+                </div>
               </div>
 
-              {/* Details */}
-              <div className="w-full lg:w-1/2 lg:pl-10 mt-6 lg:mt-0">
-                <h2 className="text-sm text-gray-500 uppercase mb-1">
+              {/* DETAILS */}
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-500 uppercase">
                   {singleProduct.brand}
-                </h2>
+                </span>
 
-                <h1 className="text-2xl lg:text-3xl font-semibold mb-2">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mt-1">
                   {singleProduct.title}
                 </h1>
 
                 {/* Rating */}
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mt-3">
                   <span className="flex items-center gap-1 bg-green-600 text-white px-2 py-0.5 rounded text-sm">
                     {singleProduct.ratings?.average || 0}
                     <FaStar className="text-xs" />
@@ -102,67 +103,68 @@ const ProductDetailPage = () => {
                 </div>
 
                 {/* Price */}
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-3xl font-bold">
+                <div className="flex flex-wrap items-center gap-3 mt-4">
+                  <span className="text-2xl sm:text-3xl font-bold">
                     ₹{price?.toLocaleString()}
                   </span>
-                  <span className="text-lg text-gray-400 line-through">
+                  <span className="text-gray-400 line-through">
                     ₹{mrp?.toLocaleString()}
                   </span>
-                  <span className="text-lg text-green-600 font-semibold">
+                  <span className="text-green-600 font-semibold">
                     {discount}% off
                   </span>
                 </div>
 
-                <p className="text-sm text-green-600 mb-4">
+                <p className="text-sm text-green-600 mt-1">
                   Inclusive of all taxes
                 </p>
 
                 {/* Offers */}
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-2">Available Offers</h3>
-                  <ul className="space-y-2 text-sm">
-                    {singleProduct.offers?.map((offer, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <RiPriceTag3Fill className="text-green-600" />
-                        {offer}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {singleProduct.offers?.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold mb-2">Available Offers</h3>
+                    <ul className="space-y-2 text-sm text-gray-700">
+                      {singleProduct.offers.map((offer, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <RiPriceTag3Fill className="text-green-600 mt-0.5" />
+                          <span>{offer}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 {/* Delivery */}
-                <div className="flex items-center gap-2 mb-6 text-sm">
+                <div className="flex items-center gap-2 mt-5 text-sm text-gray-700">
                   <RiTruckLine className="text-green-600" />
                   Delivery in{" "}
                   <span className="font-medium">
                     {singleProduct.delivery?.estimated}
-                  </span>{" "}
-                  |{" "}
-                  <span className="text-green-600">
+                  </span>
+                  <span className="text-green-600 ml-1">
                     {singleProduct.delivery?.cost}
                   </span>
                 </div>
 
                 {/* CTA */}
-                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
                   <button
-                    className="flex-1 flex items-center justify-center gap-2 bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition"
                     onClick={() => handleAddToCart(id)}
+                    className="flex items-center justify-center gap-2 bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 active:scale-95 transition"
                   >
                     <RiShoppingCartFill />
                     Add to Cart
                   </button>
 
                   <button
-                    onClick={() => handleBuyNow(id)}
-                    className="flex-1 flex items-center justify-center gap-2 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition"
+                    onClick={handleBuyNow}
+                    className="flex items-center justify-center gap-2 bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 active:scale-95 transition"
                   >
                     <RiFlashlightFill />
                     Buy Now
                   </button>
 
-                  <button className="w-full sm:w-12 h-12 rounded-lg sm:rounded-full border flex items-center justify-center hover:bg-gray-100">
+                  <button className="sm:col-span-2 h-12 rounded-xl border flex items-center justify-center hover:bg-gray-100 transition">
                     <RiHeartLine
                       size={22}
                       className="text-gray-600 hover:text-red-500"
@@ -173,7 +175,7 @@ const ProductDetailPage = () => {
                 {/* Description */}
                 <div className="mt-8">
                   <h3 className="font-semibold mb-2">Product Description</h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     {singleProduct.description}
                   </p>
                 </div>
