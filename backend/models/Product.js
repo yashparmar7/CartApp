@@ -32,7 +32,7 @@ const productSchema = new mongoose.Schema(
     // SELLER
     seller: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "SellerRequest",
+      ref: "AuthUser",
       required: true,
     },
 
@@ -119,6 +119,20 @@ const productSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    adminNote: {
+      type: String,
+      default: "",
+    },
+
+    statusUpdatedAt: {
+      type: Date,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

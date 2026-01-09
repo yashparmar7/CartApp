@@ -8,6 +8,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const sellerRequestRoutes = require("./routes/sellerRequestRoutes");
 const adminDashRoutes = require("./routes/adminDashRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 dotenv.config();
 connectDB();
 
@@ -16,12 +17,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? process.env.CLIENT_URL
+        : "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/sellerRequest", sellerRequestRoutes);
 app.use("/api/admin", adminDashRoutes);
+app.use("/api/category", categoryRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

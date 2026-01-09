@@ -26,3 +26,21 @@ export const getAllProductsAdminAPI = () => {
     console.log(err);
   }
 };
+
+export const updateSellerProductStatusAPI = (id, data) => {
+  try {
+    const res = axiosInstance.put(`/admin/products/${id}/status`, data);
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const softDeleteSellerProductAPI = (id) => {
+  try {
+    const res = axiosInstance.put(`/admin/products/${id}/softDelete`);
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};

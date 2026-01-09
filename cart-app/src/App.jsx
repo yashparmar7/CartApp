@@ -33,6 +33,8 @@ import ProductDetailPage from "./components/ProductDetailPage";
 import Loader from "./components/Loader";
 import SellerRequests from "./Pages/Admin/SellerRequests";
 import Products from "./Pages/Admin/Products";
+import Category from "./Pages/Admin/Category";
+import Orders from "./Pages/Admin/Orders";
 
 function App() {
   return (
@@ -69,6 +71,10 @@ function App() {
             />
 
             <Route path="/admin/products" element={<Products />} />
+
+            <Route path="/admin/orders" element={<Orders />} />
+
+            <Route path="/admin/categories" element={<Category />} />
           </Route>
 
           {/* SELLER */}

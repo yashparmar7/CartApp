@@ -195,3 +195,8 @@ const sellerRequestSlice = createSlice({
 });
 
 export default sellerRequestSlice.reducer;
+
+export const selectSellerRequests = (state) => state.sellerRequest.requests;
+export const selectSellerRequestLoading = (state) =>
+  state.sellerRequest.loading;
+export const selectSellerRequestError = (state) => state.sellerRequest.error;

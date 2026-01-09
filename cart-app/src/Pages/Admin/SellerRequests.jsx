@@ -84,8 +84,8 @@ const SellerRequests = () => {
       text: "This seller request will be permanently deleted!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#dc2626", // red-600
-      cancelButtonColor: "#6b7280", // gray-500
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, delete it",
       cancelButtonText: "Cancel",
       reverseButtons: true,

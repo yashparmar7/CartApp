@@ -76,7 +76,7 @@ const ProductDetailPage = () => {
                 <img
                   src={singleProduct.image?.[0]}
                   alt={singleProduct.title}
-                  className="w-full h-72 lg:h-96 object-cover rounded-lg"
+                  className="w-full h-72 lg:h-96 object-fill rounded-lg"
                 />
               </div>
 

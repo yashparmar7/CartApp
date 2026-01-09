@@ -8,6 +8,7 @@ import {
   RiBox3Line,
   RiMoneyRupeeCircleLine,
 } from "react-icons/ri";
+import { TbCategoryPlus } from "react-icons/tb";
 
 const SidebarLink = ({ to, Icon, label, collapsed, onClick }) => {
   const location = useLocation();
@@ -50,13 +51,22 @@ export const SuperAdminSidebar = (
 export const AdminSidebar = (
   <>
     <SidebarLink to="/admin" Icon={RiDashboardLine} label="Dashboard" />
+
     <SidebarLink
       to="/admin/getSellerRequests"
       Icon={RiUser3Line}
-      label="Sellers Requests"
+      label="Seller Requests"
     />
+
     <SidebarLink to="/admin/products" Icon={RiBox3Line} label="Products" />
+
     <SidebarLink to="/admin/orders" Icon={RiShoppingBag3Line} label="Orders" />
+
+    <SidebarLink
+      to="/admin/categories"
+      Icon={TbCategoryPlus}
+      label="Categories"
+    />
   </>
 );
 

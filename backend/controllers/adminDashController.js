@@ -29,7 +29,9 @@ const approveSellerRequest = async (req, res) => {
     sellerRequest.status = "APPROVED";
     await sellerRequest.save();
 
-    await User.findByIdAndUpdate(sellerRequest.user, { role: "SELLER" });
+    await User.findByIdAndUpdate(sellerRequest.user, {
+      role: "SELLER",
+    });
 
     const updated = await SellerRequest.findById(req.params.id)
       .populate({
@@ -72,9 +74,9 @@ const rejectSellerRequest = async (req, res) => {
 const getAllProductsAdmin = async (req, res) => {
   try {
     const products = await Product.find()
-      .populate("seller", "user email shopName")
-      .sort({ createdAt: -1 });
-    // .populate("category", "name")
+      .populate("seller", "userName email shopName")
+      .sort({ createdAt: -1 })
+      .populate("category", "name");
 
     console.log(products);
     res.status(200).json({
@@ -111,6 +113,51 @@ const updateSellerUserRole = async (req, res) => {
   }
 };
 
+const updateSellerProductStatus = async (req, res) => {
+  try {
+    const { status, adminNote } = req.body;
+
+    const allowedStatus = ["PENDING", "APPROVED", "REJECTED", "BLOCKED"];
+    if (!allowedStatus.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    if (["REJECTED", "BLOCKED"].includes(status) && !adminNote?.trim()) {
+      return res
+        .status(400)
+        .json({ message: "Admin note is required for reject or block" });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.status = status;
+    product.adminNote = adminNote || "";
+
+    if (status === "BLOCKED" || status === "REJECTED") {
+      product.isActive = false;
+    } else if (status === "APPROVED") {
+      product.isActive = true;
+    }
+
+    product.statusUpdatedAt = new Date();
+
+    await product.save();
+
+    res.status(200).json({
+      message: "Product status updated successfully",
+      product,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error in updating product status",
+      error: err.message,
+    });
+  }
+};
+
 const deleteSellerRequest = async (req, res) => {
   try {
     const deleted = await SellerRequest.findByIdAndDelete(req.params.id);
@@ -122,11 +169,40 @@ const deleteSellerRequest = async (req, res) => {
     });
   }
 };
+
+const softDeleteSellerProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.isDeleted = true;
+    product.status = "BLOCKED";
+    product.isActive = false;
+    product.adminNote = "Removed by admin";
+
+    await product.save();
+
+    res.status(200).json({
+      message: "Product removed from store",
+      product,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error deleting product",
+      error: err.message,
+    });
+  }
+};
 module.exports = {
   getSellerRequests,
   approveSellerRequest,
   rejectSellerRequest,
   updateSellerUserRole,
+  updateSellerProductStatus,
   deleteSellerRequest,
   getAllProductsAdmin,
+  softDeleteSellerProduct,
 };
