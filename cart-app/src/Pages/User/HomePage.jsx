@@ -9,7 +9,8 @@ import Footer from "../../components/Footer";
 import Loader from "../../components/Loader";
 
 // Assets
-import heroImage from "../../assets/hero-section.png";
+// import heroImage from "../../assets/hero-section.png";
+import heroImage from "../../assets/family-shop.png";
 
 // Icons
 import {
@@ -28,10 +29,8 @@ import {
 import { GiRunningShoe, GiLipstick } from "react-icons/gi";
 import { FaTshirt, FaTv, FaHome } from "react-icons/fa";
 
-// Redux
 import { getAllCategories } from "../../features/category/categorySlice";
 
-// Fallback icons map
 const iconMap = {
   Mobiles: MdPhoneAndroid,
   Fashion: FaTshirt,
