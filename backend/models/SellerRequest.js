@@ -6,7 +6,7 @@ const SellerRequestSchema = new mongoose.Schema(
     email: String,
     shopName: String,
     phone: String,
-    category: String,
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     description: String,
     panNumber: String,
     aadhaarNumber: String,

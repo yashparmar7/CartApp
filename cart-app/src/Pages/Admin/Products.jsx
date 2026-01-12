@@ -347,7 +347,15 @@ const Products = () => {
                     <td className="px-4 py-3 text-green-600 font-semibold">
                       {discountPercentage}%
                     </td>
-                    <td className="px-4 py-3">{product.stock}</td>
+                    <td className="px-4 py-3">
+                      {product.stock < 10 ? (
+                        <span className="text-red-600 font-semibold">
+                          Low ({product.stock})
+                        </span>
+                      ) : (
+                        product.stock
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
                         {renderStars(product.ratings?.average)}

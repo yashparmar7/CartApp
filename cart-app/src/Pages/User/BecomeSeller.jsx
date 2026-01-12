@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSellerRequest } from "../../features/sellerRequest/sellerRequestSlice";
+import { getAllCategories } from "../../features/category/categorySlice";
 import { toast } from "react-hot-toast";
 import Navbar from "../../components/Navbar";
 
 const BecomeSeller = () => {
   const { user } = useSelector((state) => state.auth);
+  const { categories } = useSelector((state) => state.category);
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
@@ -18,6 +20,10 @@ const BecomeSeller = () => {
     panNumber: "",
     aadhaarNumber: "",
   });
+
+  useEffect(() => {
+    dispatch(getAllCategories());
+  }, [dispatch]);
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -131,11 +137,14 @@ const BecomeSeller = () => {
             onChange={handleChange}
             className="w-full mb-3 px-4 py-2 border rounded"
           >
-            <option value="">Select Category *</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Fashion">Fashion</option>
-            <option value="Grocery">Grocery</option>
-            <option value="Others">Others</option>
+            <option value="" disabled>
+              Select Category
+            </option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
           </select>
 
           <textarea

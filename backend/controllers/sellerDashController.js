@@ -111,4 +111,125 @@ const createProduct = async (req, res) => {
   }
 };
 
-module.exports = { getMyProducts, createProduct };
+const updateProduct = async (req, res) => {
+  try {
+    const {
+      title,
+      brand,
+      description,
+      price,
+      mrp,
+      stock,
+      category,
+      offers,
+      delivery,
+    } = req.body;
+
+    if (
+      !title ||
+      !brand ||
+      !description ||
+      price === "" ||
+      isNaN(Number(price)) ||
+      mrp === "" ||
+      isNaN(Number(mrp)) ||
+      !category
+    ) {
+      return res.status(400).json({
+        message: "Please provide all required fields with valid values",
+      });
+    }
+
+    // Find existing product
+    const existingProduct = await Product.findById(req.params.id);
+    if (!existingProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if seller owns the product
+    if (existingProduct.seller.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Handle images: append new images to existing ones
+    let updatedImages = existingProduct.image || [];
+    if (req.files?.length) {
+      const newImages = req.files.map((file) => file.path);
+      updatedImages = [...updatedImages, ...newImages];
+    }
+
+    // Normalize inputs
+    const parsedOffers = Array.isArray(offers)
+      ? offers
+      : typeof offers === "string"
+      ? offers.split(",").map((o) => o.trim())
+      : existingProduct.offers;
+
+    const parsedDelivery =
+      typeof delivery === "string"
+        ? JSON.parse(delivery)
+        : delivery || existingProduct.delivery;
+
+    const discount = Math.round(
+      ((Number(mrp) - Number(price)) / Number(mrp)) * 100
+    );
+
+    const updateData = {
+      title,
+      brand,
+      description,
+      pricing: {
+        price: Number(price),
+        mrp: Number(mrp),
+        discountPercentage: discount,
+      },
+      stock: Number(stock) || existingProduct.stock,
+      category,
+      offers: parsedOffers,
+      delivery: parsedDelivery,
+      image: updatedImages,
+      status: "PENDING",
+      isActive: false,
+    };
+
+    const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    })
+      .populate("category")
+      .populate("seller");
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error in updating product",
+      error: err.message,
+    });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (product.seller.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error in deleting product",
+      error: err.message,
+    });
+  }
+};
+
+module.exports = { getMyProducts, createProduct, updateProduct, deleteProduct };

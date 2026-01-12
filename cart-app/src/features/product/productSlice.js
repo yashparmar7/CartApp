@@ -7,6 +7,8 @@ import {
   softDeleteSellerProductAPI,
   getSellerMyProductsAPI,
   createProductAPI,
+  updateProductAPI,
+  deleteProductAPI,
 } from "./productAPI";
 
 export const getAllProducts = createAsyncThunk(
@@ -102,28 +104,22 @@ export const createProduct = createAsyncThunk(
     try {
       const fd = new FormData();
 
-      // BASIC
       fd.append("title", formData.title);
       fd.append("brand", formData.brand);
       fd.append("description", formData.description);
       fd.append("category", formData.category);
 
-      // PRICING (FLAT – VERY IMPORTANT)
       fd.append("price", formData.pricing.price);
       fd.append("mrp", formData.pricing.mrp);
 
-      // STOCK
       fd.append("stock", formData.stock);
 
-      // DELIVERY
       fd.append("estimated", formData.delivery.estimated);
       fd.append("cost", formData.delivery.cost);
       fd.append("codAvailable", formData.delivery.codAvailable);
 
-      // OFFERS (string or array)
       fd.append("offers", formData.offers);
 
-      // IMAGES
       images.forEach((img) => {
         fd.append("images", img);
       });
@@ -134,6 +130,57 @@ export const createProduct = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to create product"
+      );
+    }
+  }
+);
+
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async ({ id, formData, images }, { rejectWithValue }) => {
+    try {
+      const fd = new FormData();
+
+      fd.append("title", formData.title);
+      fd.append("brand", formData.brand);
+      fd.append("description", formData.description);
+      fd.append("category", formData.category);
+
+      fd.append("price", formData.pricing.price);
+      fd.append("mrp", formData.pricing.mrp);
+
+      fd.append("stock", formData.stock);
+
+      fd.append("estimated", formData.delivery.estimated);
+      fd.append("cost", formData.delivery.cost);
+      fd.append("codAvailable", formData.delivery.codAvailable);
+
+      fd.append("offers", formData.offers);
+
+      images.forEach((img) => {
+        fd.append("images", img);
+      });
+
+      const res = await updateProductAPI(id, fd);
+
+      return res.data.product;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update product"
+      );
+    }
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  "product/deleteProduct",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await deleteProductAPI(id);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete product"
       );
     }
   }
@@ -255,9 +302,41 @@ export const productSlice = createSlice({
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.myProducts.unshift(action.payload.product);
+        state.myProducts.unshift(action.payload);
       })
       .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(updateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.myProducts = state.myProducts.map((product) =>
+          product._id === action.payload._id ? action.payload : product
+        );
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.myProducts = state.myProducts.filter(
+          (product) => product._id !== action.payload._id
+        );
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

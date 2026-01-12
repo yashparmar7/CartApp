@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getSellerMyProducts,
+  getSingleProduct,
   createProduct,
+  updateProduct,
+  deleteProduct,
 } from "../../features/product/productSlice";
 import { getAllCategories } from "../../features/category/categorySlice";
 import { RiEdit2Line, RiDeleteBin6Line, RiEyeLine } from "react-icons/ri";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { FaStar, FaStarHalfAlt, FaRegStar, FaPlus } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import { toast } from "react-hot-toast";
 import Swal from "sweetalert2";
@@ -68,46 +71,119 @@ const MyProducts = () => {
     dispatch(getAllCategories());
   }, [dispatch]);
 
-  const handleCreateProduct = (e) => {
+  const handleCreateProduct = async (e) => {
     e.preventDefault();
 
-    dispatch(
-      createProduct({
-        formData,
-        images,
-      })
-    )
-      .unwrap(
-        () => {
-          toast.success("Product created successfully!");
+    try {
+      await dispatch(createProduct({ formData, images })).unwrap();
+
+      toast.success("Product created successfully!");
+
+      setFormData({
+        title: "",
+        brand: "",
+        description: "",
+        category: "",
+        pricing: { price: "", mrp: "" },
+        stock: "",
+        delivery: {
+          estimated: "3-5 Days",
+          cost: "Free",
+          codAvailable: true,
         },
-        (err) => {
-          toast.error(err);
-        }
-      )
-      .then(() => {
-        // Reset form on success
-        setFormData({
-          title: "",
-          brand: "",
-          description: "",
-          category: "",
-          pricing: {
-            price: "",
-            mrp: "",
-          },
-          stock: "",
-          delivery: {
-            estimated: "3-5 Days",
-            cost: "Free",
-            codAvailable: true,
-          },
-          offers: "",
-        });
-        setImages([]);
-        setIsCreateOpen(false);
-        dispatch(getSellerMyProducts());
+        offers: "",
       });
+
+      setImages([]);
+      setIsCreateOpen(false);
+
+      dispatch(getSellerMyProducts());
+    } catch (err) {
+      toast.error(err?.message || "Failed to create product");
+    }
+  };
+
+  const prepareEditPayload = (product) => ({
+    title: product.title,
+    brand: product.brand,
+    description: product.description,
+    category: product.category?._id || product.category,
+    pricing: {
+      price: Number(product.pricing?.price),
+      mrp: Number(product.pricing?.mrp),
+    },
+    stock: Number(product.stock),
+    delivery: {
+      estimated: product.delivery?.estimated,
+      cost: product.delivery?.cost,
+      codAvailable: product.delivery?.codAvailable,
+    },
+    offers: product.offers,
+    isActive: product.isActive,
+    status: product.status,
+  });
+
+  const closeEditModal = () => {
+    setIsEditOpen(false);
+    setSelectedProduct(null);
+    setImages([]);
+  };
+
+  const handleSaveChanges = async () => {
+    if (!selectedProduct?._id) {
+      toast.error("Invalid product");
+      return;
+    }
+
+    const payload = prepareEditPayload(selectedProduct);
+
+    const updatePayload = {
+      id: selectedProduct._id,
+      formData: payload,
+      images: images,
+    };
+
+    try {
+      await dispatch(updateProduct(updatePayload)).unwrap();
+
+      toast.success("Product updated successfully");
+
+      closeEditModal();
+      dispatch(getSellerMyProducts());
+    } catch (err) {
+      toast.error(err?.message || "Failed to update product");
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    Swal.fire({
+      title: "Delete product?",
+      text: "This product will be removed from the store.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(deleteProduct(id)).unwrap();
+          toast.success("Product deleted successfully");
+          dispatch(getSellerMyProducts());
+        } catch (err) {
+          toast.error(err?.message || "Failed to delete product");
+        }
+      }
+    });
+  };
+
+  const handleViewProduct = (id) => {
+    dispatch(getSingleProduct(id))
+      .unwrap()
+      .then(() => setIsViewOpen(true))
+      .catch(() => toast.error("Failed to load product"));
   };
 
   if (loading) return <Loader />;
@@ -127,23 +203,34 @@ const MyProducts = () => {
   return (
     <div className="p-4 sm:p-6">
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* TITLE */}
+        <h1 className="text-lg sm:text-2xl font-semibold text-gray-800">
           My Products
         </h1>
 
-        <div className="flex items-center gap-3">
-          <p className="text-sm text-gray-500">
-            Active Products:{" "}
-            <span className="font-semibold text-orange-600">
+        {/* RIGHT SIDE */}
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-xs sm:text-sm text-gray-500">
+            Active Products:
+            <span className="ml-1 font-semibold text-orange-600">
               {activeProducts}
             </span>
           </p>
+
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600"
+            className="
+        flex items-center justify-center
+        px-3 py-3 sm:px-4 
+        rounded-lg bg-red-500 text-white
+        text-xs sm:text-sm
+        hover:bg-red-600
+        w-full sm:w-auto
+      "
           >
-            + Add Product
+            <FaPlus className="mr-1 sm:mr-2" />
+            Add Product
           </button>
         </div>
       </div>
@@ -233,7 +320,10 @@ const MyProducts = () => {
 
               {/* ACTIONS */}
               <div className="flex justify-end gap-2 mt-4">
-                <button className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white">
+                <button
+                  onClick={() => handleViewProduct(product._id)}
+                  className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
+                >
                   <RiEyeLine />
                 </button>
 
@@ -247,7 +337,10 @@ const MyProducts = () => {
                   <RiEdit2Line />
                 </button>
 
-                <button className="p-2 rounded-lg bg-gray-200 hover:bg-red-600 hover:text-white">
+                <button
+                  onClick={() => handleDeleteProduct(product._id)}
+                  className="p-2 rounded-lg bg-gray-200 hover:bg-red-600 hover:text-white"
+                >
                   <RiDeleteBin6Line />
                 </button>
               </div>
@@ -338,7 +431,15 @@ const MyProducts = () => {
                     <td className="px-4 py-3 text-green-600 font-semibold">
                       {discountPercentage}%
                     </td>
-                    <td className="px-4 py-3">{product.stock}</td>
+                    <td className="px-4 py-3">
+                      {product.stock < 10 ? (
+                        <span className="text-red-600 font-semibold">
+                          Low ({product.stock})
+                        </span>
+                      ) : (
+                        product.stock
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
                         {renderStars(product.ratings?.average)}
@@ -364,7 +465,10 @@ const MyProducts = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
-                        <button className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white">
+                        <button
+                          onClick={() => handleViewProduct(product._id)}
+                          className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
+                        >
                           <RiEyeLine />
                         </button>
 
@@ -378,7 +482,10 @@ const MyProducts = () => {
                           <RiEdit2Line />
                         </button>
 
-                        <button className="p-2 rounded-lg bg-gray-200 hover:bg-red-600 hover:text-white">
+                        <button
+                          onClick={() => handleDeleteProduct(product._id)}
+                          className="p-2 rounded-lg bg-gray-200 hover:bg-red-600 hover:text-white"
+                        >
                           <RiDeleteBin6Line />
                         </button>
                       </div>
@@ -914,10 +1021,7 @@ const MyProducts = () => {
               </button>
 
               <button
-                onClick={() => {
-                  // dispatch(updateProductThunk({ id, data: selectedProduct, images }))
-                  setIsEditOpen(false);
-                }}
+                onClick={() => handleSaveChanges()}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm"
               >
                 Save Changes

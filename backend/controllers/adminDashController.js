@@ -10,6 +10,12 @@ const getSellerRequests = async (req, res) => {
         select: "email userName role _id",
         model: "AuthUser",
       })
+      .populate({
+        path: "category",
+        select: "name",
+        model: "Category",
+      })
+
       .lean();
 
     res.status(200).json(sellerRequests);

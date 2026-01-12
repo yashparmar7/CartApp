@@ -66,3 +66,25 @@ export const createProductAPI = (data) => {
     console.log(err);
   }
 };
+
+export const updateProductAPI = (id, data) => {
+  try {
+    const res = axiosInstance.put(`/seller/updateProduct/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const deleteProductAPI = (id) => {
+  try {
+    const res = axiosInstance.delete(`/seller/deleteProduct/${id}`);
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};

@@ -16,7 +16,8 @@ const SellerDashboard = () => {
 
   useEffect(() => {
     dispatch(getSellerMyProducts());
-  });
+  }, [dispatch]);
+
   const stats = [
     {
       label: "My Products",

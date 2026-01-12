@@ -38,6 +38,8 @@ const SellerRequests = () => {
     dispatch(fetchSellerRequests());
   }, [dispatch]);
 
+  console.log(fetchSellerRequests());
+
   const handleApprove = async (id) => {
     try {
       await dispatch(approveSellerRequest(id)).unwrap();
@@ -200,7 +202,7 @@ const SellerRequests = () => {
               before:content-[attr(data-label)] before:float-left before:font-medium
               before:text-gray-500 sm:before:hidden"
                   >
-                    {req.category}
+                    {req.category?.name ?? "No Category"}
                   </td>
 
                   {/* STATUS */}
