@@ -134,14 +134,17 @@ const updateSellerProductStatus = async (req, res) => {
 
     product.status = status;
     product.adminNote = adminNote || "";
+    product.statusUpdatedAt = new Date();
 
-    if (status === "BLOCKED" || status === "REJECTED") {
-      product.isActive = false;
-    } else if (status === "APPROVED") {
+    if (status === "APPROVED") {
       product.isActive = true;
+      product.isDeleted = false;
     }
 
-    product.statusUpdatedAt = new Date();
+    if (status === "REJECTED" || status === "BLOCKED") {
+      product.isActive = false;
+      product.isDeleted = false;
+    }
 
     await product.save();
 

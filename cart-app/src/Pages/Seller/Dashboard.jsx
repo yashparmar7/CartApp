@@ -4,11 +4,23 @@ import {
   RiMoneyRupeeCircleLine,
 } from "react-icons/ri";
 
+import Loader from "../../components/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getSellerMyProducts } from "../../features/product/productSlice";
+
 const SellerDashboard = () => {
+  const dispatch = useDispatch();
+
+  const { myProducts, isLoading } = useSelector((state) => state.product);
+
+  useEffect(() => {
+    dispatch(getSellerMyProducts());
+  });
   const stats = [
     {
       label: "My Products",
-      value: 15,
+      value: myProducts?.length || 0,
       icon: RiBox3Line,
     },
     {
@@ -26,6 +38,7 @@ const SellerDashboard = () => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {isLoading && <Loader />}
       {stats.map(({ label, value, icon: Icon, highlight }) => (
         <div
           key={label}

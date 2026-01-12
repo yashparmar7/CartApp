@@ -58,7 +58,6 @@ const HomePage = () => {
     <>
       <Navbar />
 
-      {/* ================= HERO SECTION ================= */}
       <section className="relative overflow-hidden bg-gradient-to-br from-red-500 via-red-400 to-orange-400 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
           <div className="flex flex-col-reverse lg:flex-row items-center gap-10 lg:gap-16">
@@ -102,7 +101,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ================= CATEGORIES ================= */}
+      {/* categories  */}
       <section className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           {loading ? (
@@ -147,7 +146,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ================= FEATURES ================= */}
+      {/*  FEATURES  */}
       <section className="bg-gray-50">
         <div className="mx-auto px-4 py-6">
           <div className="flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-4 md:gap-6 md:overflow-visible">
@@ -171,7 +170,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ================= TOP DEALS ================= */}
+      {/*  TOP DEALS  */}
       <section className="bg-white">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
@@ -188,7 +187,7 @@ const HomePage = () => {
         <Card />
       </section>
 
-      {/* ================= SALE CTA ================= */}
+      {/*  SALE CTA  */}
       <section className="bg-red-50">
         <div className="container mx-auto px-4 py-10 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">

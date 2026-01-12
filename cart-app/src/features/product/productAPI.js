@@ -44,3 +44,25 @@ export const softDeleteSellerProductAPI = (id) => {
     console.log(err);
   }
 };
+
+export const getSellerMyProductsAPI = () => {
+  try {
+    const res = axiosInstance.get("/seller/getMyProducts");
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const createProductAPI = (data) => {
+  try {
+    const res = axiosInstance.post("/seller/createProduct", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};

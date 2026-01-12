@@ -35,6 +35,7 @@ import SellerRequests from "./Pages/Admin/SellerRequests";
 import Products from "./Pages/Admin/Products";
 import Category from "./Pages/Admin/Category";
 import Orders from "./Pages/Admin/Orders";
+import MyProducts from "./Pages/Seller/MyProducts";
 
 function App() {
   return (
@@ -87,6 +88,7 @@ function App() {
             }
           >
             <Route index element={<SellerDashboard />} />
+            <Route path="/seller/products" element={<MyProducts />} />
           </Route>
           {/* SUPER ADMIN */}
           <Route

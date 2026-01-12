@@ -5,6 +5,8 @@ import {
   getAllProductsAdminAPI,
   updateSellerProductStatusAPI,
   softDeleteSellerProductAPI,
+  getSellerMyProductsAPI,
+  createProductAPI,
 } from "./productAPI";
 
 export const getAllProducts = createAsyncThunk(
@@ -80,9 +82,67 @@ export const softDeleteSellerProduct = createAsyncThunk(
   }
 );
 
+export const getSellerMyProducts = createAsyncThunk(
+  "product/getSellerMyProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getSellerMyProductsAPI();
+      return res.data.products;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch products"
+      );
+    }
+  }
+);
+
+export const createProduct = createAsyncThunk(
+  "product/createProduct",
+  async ({ formData, images }, { rejectWithValue }) => {
+    try {
+      const fd = new FormData();
+
+      // BASIC
+      fd.append("title", formData.title);
+      fd.append("brand", formData.brand);
+      fd.append("description", formData.description);
+      fd.append("category", formData.category);
+
+      // PRICING (FLAT – VERY IMPORTANT)
+      fd.append("price", formData.pricing.price);
+      fd.append("mrp", formData.pricing.mrp);
+
+      // STOCK
+      fd.append("stock", formData.stock);
+
+      // DELIVERY
+      fd.append("estimated", formData.delivery.estimated);
+      fd.append("cost", formData.delivery.cost);
+      fd.append("codAvailable", formData.delivery.codAvailable);
+
+      // OFFERS (string or array)
+      fd.append("offers", formData.offers);
+
+      // IMAGES
+      images.forEach((img) => {
+        fd.append("images", img);
+      });
+
+      const res = await createProductAPI(fd);
+
+      return res.data.product;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to create product"
+      );
+    }
+  }
+);
+
 const initialState = {
   products: [],
   singleProduct: {},
+  myProducts: [],
   loading: false,
   error: null,
 };
@@ -159,11 +219,45 @@ export const productSlice = createSlice({
       })
       .addCase(softDeleteSellerProduct.fulfilled, (state, action) => {
         state.loading = false;
+
         state.products = state.products.filter(
           (product) => product._id !== action.payload._id
         );
+
+        state.myProducts = state.myProducts.filter(
+          (product) => product._id !== action.payload._id
+        );
       })
+
       .addCase(softDeleteSellerProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(getSellerMyProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getSellerMyProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.myProducts = action.payload;
+      })
+      .addCase(getSellerMyProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(createProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.myProducts.unshift(action.payload.product);
+      })
+      .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -175,5 +269,6 @@ export const selectProducts = (state) => state.product.products;
 export const selectSingleProduct = (state) => state.product.singleProduct;
 export const selectProductLoading = (state) => state.product.loading;
 export const selectProductError = (state) => state.product.error;
+export const selectMyProducts = (state) => state.product.myProducts;
 
 export default productSlice.reducer;
