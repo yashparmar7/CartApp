@@ -5,6 +5,7 @@ import productReducer from "../features/product/productSlice";
 import sellerRequestReducer from "../features/sellerRequest/sellerRequestSlice";
 import categoryReducer from "../features/category/categorySlice";
 import roleReducer from "../features/role/roleSlice";
+import orderReducer from "../features/order/orderSlice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     sellerRequest: sellerRequestReducer,
     category: categoryReducer,
     role: roleReducer,
+    order: orderReducer,
   },
 });
 

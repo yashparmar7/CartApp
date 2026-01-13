@@ -39,6 +39,7 @@ import MyEarnings from "./Pages/Seller/MyEarnings";
 import Users from "./Pages/SuperAdmin/Users";
 import Sellers from "./Pages/SuperAdmin/Sellers";
 import OrdersPage from "./Pages/SuperAdmin/Orders";
+import CheckoutPage from "./Pages/User/CheckoutPage";
 
 function App() {
   return (
@@ -51,13 +52,14 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/become-seller" element={<BecomeSeller />} />
 
-          {/* ADMIN */}
           {/* ADMIN */}
           <Route
             path="/admin"

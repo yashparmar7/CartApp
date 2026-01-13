@@ -76,3 +76,11 @@
         transform: scale(1);
     }
 }
+
+.input {
+    @apply w-full h-11 border rounded-lg px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-500;
+}
+
+.payment-option {
+    @apply flex items-center gap-4 border rounded-lg p-4 cursor-pointer hover:border-red-500 text-sm;
+}

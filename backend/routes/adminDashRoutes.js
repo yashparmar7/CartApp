@@ -9,6 +9,10 @@ const {
   deleteSellerRequest,
   getAllProductsAdmin,
   softDeleteSellerProduct,
+  getAllOrders,
+  updateOrder,
+  deleteOrder,
+  getSingleOrder,
 } = require("../controllers/adminDashController");
 const auth = require("../middleware/authMiddleware.js");
 
@@ -23,5 +27,10 @@ router.put("/products/:id/softDelete", auth, softDeleteSellerProduct);
 router.delete("/seller-requests/:id", auth, deleteSellerRequest);
 
 router.get("/getAllProductsAdmin", auth, getAllProductsAdmin);
+
+router.get("/getAllOrders", auth, getAllOrders);
+router.put("/updateOrder/:id", auth, updateOrder);
+router.delete("/deleteOrder/:id", auth, deleteOrder);
+router.get("/getSingleOrder/:id", auth, getSingleOrder);
 
 module.exports = router;

@@ -12,8 +12,10 @@ import {
 import { selectIsAuthenticated } from "../../features/auth/authSlice";
 import Loader from "../../components/Loader";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { cart, loading, error } = useSelector((state) => state.cart);
@@ -55,8 +57,7 @@ const CartPage = () => {
       toast.error("Please login to continue");
       return;
     }
-    // Implement checkout logic here
-    toast.success("Proceeding to checkout...");
+    navigate("/checkout");
   };
 
   if (loading) return <Loader />;
