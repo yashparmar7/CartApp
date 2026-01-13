@@ -1,12 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoCart, IoMenu, IoClose } from "react-icons/io5";
 import { HiOutlineLogout } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync } from "../features/auth/authSlice";
 import toast from "react-hot-toast";
-
-import useRoleRedirect from "../hook/useRoleRedirect";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -16,22 +14,24 @@ const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
   const { cart } = useSelector((state) => state.cart);
 
-  const prevRole = useRef(user?.role);
-
-  useRoleRedirect(user);
-
-  useEffect(() => {
-    if (prevRole.current === "USER" && user?.role === "SELLER") {
-      toast.success("You're now a Seller");
-    }
-    prevRole.current = user?.role;
-  }, [user?.role]);
-
   const handleLogout = () => {
     dispatch(logoutAsync());
     navigate("/login");
     toast.success("Logout successful!");
     setOpen(false);
+  };
+
+  const getDashboardPath = (role) => {
+    switch (role) {
+      case "ADMIN":
+        return "/admin";
+      case "SUPERADMIN":
+        return "/superadmin";
+      case "SELLER":
+        return "/seller";
+      default:
+        return "/";
+    }
   };
 
   return (
@@ -121,14 +121,23 @@ const Navbar = () => {
                     Hi, {user.userName}
                   </span>
 
-                  {user.role === "USER" && (
+                  {user?.role === "USER" ? (
                     <Link
                       to="/become-seller"
                       className="border border-red-500 text-red-500
-                      py-1 px-3 rounded font-semibold
-                      hover:bg-red-500 hover:text-white transition"
+    py-1 px-3 rounded font-semibold
+    hover:bg-red-500 hover:text-white transition"
                     >
                       Become a Seller
+                    </Link>
+                  ) : (
+                    <Link
+                      to={getDashboardPath(user?.role)}
+                      className="border border-red-500 text-red-600
+    py-1 px-3 rounded font-semibold
+    hover:bg-red-500 hover:text-white transition"
+                    >
+                      Go to Dashboard
                     </Link>
                   )}
 
@@ -204,13 +213,23 @@ const Navbar = () => {
             Cart
           </Link>
 
-          {user && user.role === "USER" && (
+          {user?.role === "USER" ? (
             <Link
-              onClick={() => setOpen(false)}
-              className="px-4 py-3 border-b border-gray-300 text-red-500 font-semibold"
               to="/become-seller"
+              className=" text-red-500
+    py-3 px-4 rounded font-semibold
+    hover:bg-red-500 hover:text-white transition"
             >
               Become a Seller
+            </Link>
+          ) : (
+            <Link
+              to={getDashboardPath(user?.role)}
+              className=" text-red-600
+    py-3 px-4 rounded font-semibold
+    hover:bg-red-500 hover:text-white transition"
+            >
+              Go to Dashboard
             </Link>
           )}
 
