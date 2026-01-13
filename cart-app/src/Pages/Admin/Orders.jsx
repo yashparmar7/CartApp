@@ -184,7 +184,6 @@ const Orders = () => {
         )}
       </div>
 
-      {/* ---------------- VIEW ORDER MODAL ---------------- */}
       {isViewOpen && selectedOrder && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden">

@@ -4,16 +4,19 @@ import { useEffect } from "react";
 
 import { getAllProductsAdmin } from "../../features/product/productSlice";
 import { fetchSellerRequests } from "../../features/sellerRequest/sellerRequestSlice";
+import { getAllOrders } from "../../features/order/orderSlice";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
 
   const { products } = useSelector((state) => state.product);
   const { requests } = useSelector((state) => state.sellerRequest);
+  const { orders } = useSelector((state) => state.order);
 
   useEffect(() => {
     dispatch(getAllProductsAdmin());
     dispatch(fetchSellerRequests());
+    dispatch(getAllOrders());
   }, [dispatch]);
 
   const approvedSellers =
@@ -32,7 +35,7 @@ const AdminDashboard = () => {
     },
     {
       label: "Total Orders",
-      value: 3120,
+      value: orders?.length || 0,
       icon: RiShoppingBag3Line,
     },
   ];
