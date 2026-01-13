@@ -60,16 +60,24 @@ const MyProducts = () => {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const { singleProduct } = useSelector((state) => state.product);
 
-  const { myProducts, loading } = useSelector((state) => state.product);
+  const { myProducts, loading, sellerProductsStatus } = useSelector(
+    (state) => state.product
+  );
 
-  const { categories } = useSelector((state) => state.category);
+  const { categories, status: categoryStatus } = useSelector(
+    (state) => state.category
+  );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getSellerMyProducts());
-    dispatch(getAllCategories());
-  }, [dispatch]);
+    if (sellerProductsStatus === "idle") {
+      dispatch(getSellerMyProducts());
+    }
+    if (categoryStatus === "idle") {
+      dispatch(getAllCategories());
+    }
+  }, [dispatch, sellerProductsStatus, categoryStatus]);
 
   const handleCreateProduct = async (e) => {
     e.preventDefault();

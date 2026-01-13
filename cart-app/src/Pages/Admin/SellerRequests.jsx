@@ -25,6 +25,7 @@ const SellerRequests = () => {
     requests = [],
     loading,
     error,
+    status,
   } = useSelector((state) => state.sellerRequest);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,10 +36,10 @@ const SellerRequests = () => {
   const [selectedRole, setSelectedRole] = useState("SELLER");
 
   useEffect(() => {
-    dispatch(fetchSellerRequests());
-  }, [dispatch]);
-
-  console.log(fetchSellerRequests());
+    if (status === "idle") {
+      dispatch(fetchSellerRequests());
+    }
+  }, [dispatch, status]);
 
   const handleApprove = async (id) => {
     try {

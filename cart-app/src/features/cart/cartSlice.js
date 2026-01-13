@@ -77,14 +77,17 @@ const cartSlice = createSlice({
       .addCase(getCart.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.status = "loading";
       })
       .addCase(getCart.fulfilled, (state, action) => {
         state.loading = false;
         state.cart = action.payload.products;
+        state.status = "succeeded";
       })
       .addCase(getCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.status = "failed";
       })
 
       .addCase(addToCart.pending, (state) => {

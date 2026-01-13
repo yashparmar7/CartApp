@@ -75,11 +75,15 @@ export const SellerSidebar = (
   <>
     <SidebarLink to="/seller" Icon={RiDashboardLine} label="Dashboard" />
     <SidebarLink to="/seller/products" Icon={RiBox3Line} label="My Products" />
-    <SidebarLink to="/seller/orders" Icon={RiShoppingBag3Line} label="Orders" />
+    <SidebarLink
+      to="/seller/orders"
+      Icon={RiShoppingBag3Line}
+      label="My Orders"
+    />
     <SidebarLink
       to="/seller/earnings"
       Icon={RiMoneyRupeeCircleLine}
-      label="Earnings"
+      label="My Earnings"
     />
   </>
 );

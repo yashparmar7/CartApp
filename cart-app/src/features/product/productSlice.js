@@ -192,6 +192,9 @@ const initialState = {
   myProducts: [],
   loading: false,
   error: null,
+  productsStatus: "idle",
+  productsAdminStatus: "idle",
+  sellerProductsStatus: "idle",
 };
 export const productSlice = createSlice({
   name: "product",
@@ -202,15 +205,18 @@ export const productSlice = createSlice({
       .addCase(getAllProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.productsStatus = "loading";
       })
       .addCase(getAllProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.products = action.payload.products;
+        state.productsStatus = "succeeded";
       })
 
       .addCase(getAllProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.productsStatus = "failed";
       })
 
       .addCase(getSingleProduct.pending, (state) => {
@@ -230,14 +236,17 @@ export const productSlice = createSlice({
       .addCase(getAllProductsAdmin.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.productsAdminStatus = "loading";
       })
       .addCase(getAllProductsAdmin.fulfilled, (state, action) => {
         state.loading = false;
         state.products = action.payload.products;
+        state.productsAdminStatus = "succeeded";
       })
       .addCase(getAllProductsAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.productsAdminStatus = "failed";
       });
 
     builder
@@ -285,14 +294,17 @@ export const productSlice = createSlice({
       .addCase(getSellerMyProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.sellerProductsStatus = "loading";
       })
       .addCase(getSellerMyProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.myProducts = action.payload;
+        state.sellerProductsStatus = "succeeded";
       })
       .addCase(getSellerMyProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.sellerProductsStatus = "failed";
       });
 
     builder

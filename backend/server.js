@@ -10,6 +10,7 @@ const sellerRequestRoutes = require("./routes/sellerRequestRoutes");
 const adminDashRoutes = require("./routes/adminDashRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const sellerDashRoutes = require("./routes/sellerDashRoutes");
+const superAdminDashRoutes = require("./routes/superAdminDashRoutes");
 dotenv.config();
 connectDB();
 
@@ -35,6 +36,7 @@ app.use("/api/sellerRequest", sellerRequestRoutes);
 app.use("/api/admin", adminDashRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/seller", sellerDashRoutes);
+app.use("/api/superAdmin", superAdminDashRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

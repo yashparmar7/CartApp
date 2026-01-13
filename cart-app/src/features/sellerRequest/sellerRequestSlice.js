@@ -103,14 +103,17 @@ const sellerRequestSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchSellerRequests.pending, (state) => {
       state.loading = true;
+      state.status = "loading";
     });
     builder.addCase(fetchSellerRequests.fulfilled, (state, action) => {
       state.loading = false;
       state.requests = action.payload;
+      state.status = "succeeded";
     });
     builder.addCase(fetchSellerRequests.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      state.status = "failed";
     });
 
     builder.addCase(approveSellerRequest.pending, (state) => {

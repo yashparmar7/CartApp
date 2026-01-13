@@ -62,19 +62,23 @@ const categorySlice = createSlice({
     categories: [],
     loading: false,
     error: null,
+    status: "idle",
   },
   extraReducers: (builder) => {
     builder
       .addCase(getAllCategories.pending, (state) => {
         state.loading = true;
+        state.status = "loading";
       })
       .addCase(getAllCategories.fulfilled, (state, action) => {
         state.loading = false;
         state.categories = action.payload;
+        state.status = "succeeded";
       })
       .addCase(getAllCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.status = "failed";
       });
 
     builder

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoCart, IoMenu, IoClose } from "react-icons/io5";
 import { HiOutlineLogout } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync } from "../features/auth/authSlice";
 import toast from "react-hot-toast";
+
+import useRoleRedirect from "../hook/useRoleRedirect";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -13,6 +15,17 @@ const Navbar = () => {
 
   const { user } = useSelector((state) => state.auth);
   const { cart } = useSelector((state) => state.cart);
+
+  const prevRole = useRef(user?.role);
+
+  useRoleRedirect(user);
+
+  useEffect(() => {
+    if (prevRole.current === "USER" && user?.role === "SELLER") {
+      toast.success("You're now a Seller");
+    }
+    prevRole.current = user?.role;
+  }, [user?.role]);
 
   const handleLogout = () => {
     dispatch(logoutAsync());

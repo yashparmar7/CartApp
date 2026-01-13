@@ -1,17 +1,36 @@
 const SellerRequest = require("../models/SellerRequest");
+const User = require("../models/User");
 
 const createSellerRequest = async (req, res) => {
   try {
-    const existingRequest = await SellerRequest.findOne({
-      user: req.body.user,
-    });
-    if (existingRequest && existingRequest.status === "PENDING") {
-      return res
-        .status(400)
-        .json({ message: "You already have a pending request." });
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const sellerRequest = await SellerRequest.create(req.body);
+    if (user.role === "SELLER") {
+      return res.status(400).json({ message: "You are already a seller" });
+    }
+
+    const existingRequest = await SellerRequest.findOne({
+      user: userId,
+      status: { $in: ["PENDING", "APPROVED"] },
+    });
+
+    if (existingRequest) {
+      return res.status(400).json({
+        message: "Seller request already exists",
+      });
+    }
+
+    const sellerRequest = await SellerRequest.create({
+      ...req.body,
+      user: userId,
+      status: "PENDING",
+    });
+
     res.status(201).json({
       message: "Seller request created successfully",
       data: sellerRequest,

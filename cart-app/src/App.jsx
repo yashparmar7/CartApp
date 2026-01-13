@@ -1,8 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Provider } from "react-redux";
 import { Toaster } from "react-hot-toast";
-import store from "./app/store";
 
 import DashboardLayout from "./Layout/DashboardLayout";
 import {
@@ -36,10 +34,15 @@ import Products from "./Pages/Admin/Products";
 import Category from "./Pages/Admin/Category";
 import Orders from "./Pages/Admin/Orders";
 import MyProducts from "./Pages/Seller/MyProducts";
+import MyOrders from "./Pages/Seller/MyOrders";
+import MyEarnings from "./Pages/Seller/MyEarnings";
+import Users from "./Pages/SuperAdmin/Users";
+import Sellers from "./Pages/SuperAdmin/Sellers";
+import OrdersPage from "./Pages/SuperAdmin/Orders";
 
 function App() {
   return (
-    <Provider store={store}>
+    <>
       <Toaster />
       <BrowserRouter>
         <Routes>
@@ -89,6 +92,8 @@ function App() {
           >
             <Route index element={<SellerDashboard />} />
             <Route path="/seller/products" element={<MyProducts />} />
+            <Route path="/seller/orders" element={<MyOrders />} />
+            <Route path="/seller/earnings" element={<MyEarnings />} />
           </Route>
           {/* SUPER ADMIN */}
           <Route
@@ -100,7 +105,9 @@ function App() {
             }
           >
             <Route index element={<SuperAdminDashboard />} />
-            {/* later: users, sellers, orders */}
+            <Route path="/superadmin/users" element={<Users />} />
+            <Route path="/superadmin/sellers" element={<Sellers />} />
+            <Route path="/superadmin/orders" element={<OrdersPage />} />
           </Route>
 
           {/* Utils */}
@@ -108,7 +115,7 @@ function App() {
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
-    </Provider>
+    </>
   );
 }
 

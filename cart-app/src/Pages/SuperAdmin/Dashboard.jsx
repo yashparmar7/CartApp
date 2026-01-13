@@ -5,11 +5,24 @@ import {
   RiMoneyRupeeCircleLine,
 } from "react-icons/ri";
 
+import Loader from "../../components/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getAllUsers } from "../../features/role/roleSlice";
+
 const SuperAdminDashboard = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllUsers());
+  }, [dispatch]);
+
+  const { users, loading, error } = useSelector((state) => state.role);
+
   const stats = [
     {
       label: "Total Users",
-      value: 1240,
+      value: users?.length || 0,
       icon: RiUser3Line,
     },
     {
@@ -32,6 +45,8 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {loading ? <Loader /> : null}
+      {error ? <h2 className="text-red-500">{error}</h2> : null}
       {stats.map(({ label, value, icon: Icon, highlight }) => (
         <div
           key={label}

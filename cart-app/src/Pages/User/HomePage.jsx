@@ -30,6 +30,7 @@ import { GiRunningShoe, GiLipstick } from "react-icons/gi";
 import { FaTshirt, FaTv, FaHome } from "react-icons/fa";
 
 import { getAllCategories } from "../../features/category/categorySlice";
+import { getAllProducts } from "../../features/product/productSlice";
 
 const iconMap = {
   Mobiles: MdPhoneAndroid,
@@ -46,11 +47,20 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { categories, loading } = useSelector((state) => state.category);
+  const { categories, loading, status } = useSelector(
+    (state) => state.category
+  );
+
+  const { productsStatus } = useSelector((state) => state.product);
 
   useEffect(() => {
-    dispatch(getAllCategories());
-  }, [dispatch]);
+    if (status === "idle") {
+      dispatch(getAllCategories());
+    }
+    if (productsStatus === "idle") {
+      dispatch(getAllProducts());
+    }
+  }, [dispatch, status, productsStatus]);
 
   const category = categories.filter((cat) => cat.isActive === true);
 

@@ -16,12 +16,16 @@ const Card = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { products, loading } = useSelector((state) => state.product);
+  const { products, loading, productsStatus } = useSelector(
+    (state) => state.product
+  );
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(getAllProducts());
-  }, [dispatch]);
+    if (productsStatus === "idle") {
+      dispatch(getAllProducts());
+    }
+  }, [dispatch, productsStatus]);
 
   const handleAddToCart = (e, id) => {
     e.stopPropagation();

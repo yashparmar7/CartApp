@@ -33,6 +33,18 @@ export const logoutAsync = createAsyncThunk("auth/logout", async () => {
   }
 });
 
+export const refreshUser = createAsyncThunk(
+  "auth/refreshUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await loginAPI({ token: localStorage.getItem("token") });
+      return res.data.user;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
+
 const userFromLocalStorage = JSON.parse(localStorage.getItem("user"));
 const tokenFromLocalStorage = localStorage.getItem("token");
 
@@ -98,6 +110,20 @@ const authSlice = createSlice({
         state.token = null;
         localStorage.removeItem("user");
         localStorage.removeItem("token");
+      });
+
+    builder
+      .addCase(refreshUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(refreshUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(refreshUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
