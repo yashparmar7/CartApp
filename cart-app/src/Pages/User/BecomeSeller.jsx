@@ -28,10 +28,8 @@ const BecomeSeller = () => {
   const handleChange = (e) => {
     let { name, value } = e.target;
 
-    // PAN always uppercase
     if (name === "panNumber") value = value.toUpperCase();
 
-    // Only numbers for phone & aadhaar
     if (name === "phone" || name === "aadhaarNumber") {
       value = value.replace(/\D/g, "");
     }
@@ -79,9 +77,11 @@ const BecomeSeller = () => {
 
     try {
       await dispatch(createSellerRequest(payload)).unwrap();
+
       toast.success(
         "Seller request submitted successfully. Waiting for approval"
       );
+
       setForm({
         shopName: "",
         phone: "",
@@ -90,9 +90,11 @@ const BecomeSeller = () => {
         panNumber: "",
         aadhaarNumber: "",
       });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       toast.error("Failed to submit request");
-      console.log(err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -118,6 +120,7 @@ const BecomeSeller = () => {
 
           <input
             name="shopName"
+            value={form.shopName}
             placeholder="Shop / Business Name *"
             onChange={handleChange}
             className="w-full mb-3 px-4 py-2 border rounded"
@@ -125,6 +128,7 @@ const BecomeSeller = () => {
 
           <input
             name="phone"
+            value={form.phone}
             placeholder="Phone Number *"
             maxLength={10}
             onChange={handleChange}
@@ -149,17 +153,18 @@ const BecomeSeller = () => {
 
           <textarea
             name="description"
+            value={form.description}
             placeholder="What do you sell?"
             onChange={handleChange}
             className="w-full mb-3 px-4 py-2 border rounded resize-none"
           />
 
-          {/* KYC */}
           <div className="border-t pt-4 mt-4">
             <h3 className="font-semibold mb-2">KYC Details</h3>
 
             <input
               name="panNumber"
+              value={form.panNumber}
               placeholder="PAN Number (ABCDE1234F)"
               maxLength={10}
               onChange={handleChange}
@@ -168,6 +173,7 @@ const BecomeSeller = () => {
 
             <input
               name="aadhaarNumber"
+              value={form.aadhaarNumber}
               placeholder="Aadhaar Number (12 digits)"
               maxLength={12}
               onChange={handleChange}
