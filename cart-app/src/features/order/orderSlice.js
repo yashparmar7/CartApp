@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createOrderAPI, getAllOrdersAPI } from "./orderAPI";
+import {
+  createOrderAPI,
+  getAllOrdersAPI,
+  updateOrderAPI,
+  deleteOrderAPI,
+} from "./orderAPI";
 
 export const createOrder = createAsyncThunk(
   "order/createOrder",
@@ -24,6 +29,34 @@ export const getAllOrders = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to get orders"
+      );
+    }
+  }
+);
+
+export const updateOrder = createAsyncThunk(
+  "order/updateOrder",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const res = await updateOrderAPI(id, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update order"
+      );
+    }
+  }
+);
+
+export const deleteOrder = createAsyncThunk(
+  "order/deleteOrder",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await deleteOrderAPI(id);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete order"
       );
     }
   }
@@ -87,6 +120,42 @@ const orderSlice = createSlice({
         state.loading = false;
         state.success = false;
         state.orders = [];
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(updateOrder.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.order = action.payload;
+        state.error = null;
+      })
+      .addCase(updateOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.order = null;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(deleteOrder.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+      .addCase(deleteOrder.fulfilled, (state) => {
+        state.loading = false;
+        state.success = true;
+        state.error = null;
+      })
+      .addCase(deleteOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
         state.error = action.payload;
       });
   },

@@ -13,3 +13,13 @@ export const getAllOrdersAPI = async () => {
   const res = await axiosInstance.get("/admin/getAllOrders");
   return res;
 };
+
+export const updateOrderAPI = async (id, data) => {
+  const res = await axiosInstance.put(`/admin/updateOrder/${id}`, data);
+  return res;
+};
+
+export const deleteOrderAPI = async (id) => {
+  const res = await axiosInstance.delete(`/admin/deleteOrder/${id}`);
+  return res;
+};
