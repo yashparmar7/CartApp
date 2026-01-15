@@ -67,6 +67,9 @@ const Navbar = () => {
             <Link className="mr-8 hover:text-red-500" to="/shop">
               Shop
             </Link>
+            <Link className="mr-8 hover:text-red-500" to="/my-orders">
+              My Orders
+            </Link>
             <Link className="mr-8 hover:text-red-500" to="/about">
               About
             </Link>
@@ -190,6 +193,13 @@ const Navbar = () => {
             to="/shop"
           >
             Shop
+          </Link>
+          <Link
+            onClick={() => setOpen(false)}
+            className="px-4 py-3 border-b border-gray-300"
+            to="/my-orders"
+          >
+            My Orders
           </Link>
           <Link
             onClick={() => setOpen(false)}

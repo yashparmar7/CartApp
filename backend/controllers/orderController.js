@@ -66,123 +66,65 @@ const createOrder = async (req, res) => {
   }
 };
 
-/* =====================================================
-   GET ALL ORDERS (ADMIN)
-===================================================== */
-// const getAllOrders = async (req, res) => {
-//   try {
-//     const orders = await Order.find()
-//       .populate("user", "name email")
-//       .sort({ createdAt: -1 });
-
-//     res.status(200).json({
-//       success: true,
-//       count: orders.length,
-//       orders,
-//     });
-//   } catch (error) {
-//     console.error("Get All Orders Error:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
-/* =====================================================
-   GET SINGLE ORDER (USER / ADMIN)
-===================================================== */
-const getSingleOrder = async (req, res) => {
+const getUserOrders = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      "user",
-      "name email"
-    );
+    const userId = req.user._id;
+    const orders = await Order.find({ user: userId }).populate("items.product");
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Get User Orders Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const cancelOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const userId = req.user._id.toString();
+
+    const order = await Order.findById(orderId);
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // user can only see their own order
-    if (
-      req.user.role !== "admin" &&
-      order.user._id.toString() !== req.user._id.toString()
-    ) {
-      return res.status(403).json({ message: "Access denied" });
+    if (order.user.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized action" });
     }
 
-    res.status(200).json({
+    if (order.orderStatus === "cancelled") {
+      return res.status(400).json({ message: "Order is already cancelled" });
+    }
+
+    if (order.orderStatus === "shipped" || order.orderStatus === "delivered") {
+      return res.status(400).json({
+        message: "Order cannot be cancelled after shipping",
+      });
+    }
+
+    order.orderStatus = "cancelled";
+
+    // 💸 Refund placeholder (important for paid orders)
+    if (order.isPaid) {
+      // TODO: Integrate Razorpay / Stripe refund here
+      // refundStatus = "initiated"
+    }
+
+    await order.save();
+
+    return res.status(200).json({
       success: true,
+      message: "Order cancelled successfully",
       order,
     });
   } catch (error) {
-    console.error("Get Single Order Error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Cancel Order Error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
-/* =====================================================
-   UPDATE ORDER STATUS (ADMIN)
-===================================================== */
-// const updateOrder = async (req, res) => {
-//   try {
-//     const { orderStatus, isPaid } = req.body;
-
-//     const order = await Order.findById(req.params.id);
-
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     if (orderStatus) {
-//       order.orderStatus = orderStatus;
-
-//       if (orderStatus === "delivered") {
-//         order.deliveredAt = new Date();
-//       }
-//     }
-
-//     if (isPaid !== undefined) {
-//       order.isPaid = isPaid;
-//       if (isPaid) {
-//         order.paidAt = new Date();
-//       }
-//     }
-
-//     await order.save();
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Order updated successfully",
-//       order,
-//     });
-//   } catch (error) {
-//     console.error("Update Order Error:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
-/* =====================================================
-   DELETE ORDER (ADMIN)
-===================================================== */
-// const deleteOrder = async (req, res) => {
-//   try {
-//     const order = await Order.findById(req.params.id);
-
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     await order.deleteOne();
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Order deleted successfully",
-//     });
-//   } catch (error) {
-//     console.error("Delete Order Error:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
 module.exports = {
   createOrder,
-  getSingleOrder,
+  getUserOrders,
+  cancelOrder,
 };

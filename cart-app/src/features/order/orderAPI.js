@@ -23,3 +23,13 @@ export const deleteOrderAPI = async (id) => {
   const res = await axiosInstance.delete(`/admin/deleteOrder/${id}`);
   return res;
 };
+
+export const getUserOrdersAPI = async () => {
+  const res = await axiosInstance.get("/order/getUserOrders");
+  return res;
+};
+
+export const cancelOrderAPI = async (id) => {
+  const res = await axiosInstance.put(`/order/cancelOrder/${id}`);
+  return res;
+};

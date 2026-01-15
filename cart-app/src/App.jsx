@@ -40,6 +40,7 @@ import Users from "./Pages/SuperAdmin/Users";
 import Sellers from "./Pages/SuperAdmin/Sellers";
 import OrdersPage from "./Pages/SuperAdmin/Orders";
 import CheckoutPage from "./Pages/User/CheckoutPage";
+import MyOrderPage from "./Pages/User/MyOrderPage";
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
 
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/my-orders" element={<MyOrderPage />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />

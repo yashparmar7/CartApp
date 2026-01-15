@@ -4,6 +4,8 @@ import {
   getAllOrdersAPI,
   updateOrderAPI,
   deleteOrderAPI,
+  getUserOrdersAPI,
+  cancelOrderAPI,
 } from "./orderAPI";
 
 export const createOrder = createAsyncThunk(
@@ -57,6 +59,34 @@ export const deleteOrder = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to delete order"
+      );
+    }
+  }
+);
+
+export const getUserOrders = createAsyncThunk(
+  "order/getUserOrders",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getUserOrdersAPI();
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to get user orders"
+      );
+    }
+  }
+);
+
+export const cancelOrder = createAsyncThunk(
+  "order/cancelOrder",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await cancelOrderAPI(id);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to cancel order"
       );
     }
   }
@@ -156,6 +186,44 @@ const orderSlice = createSlice({
       .addCase(deleteOrder.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(getUserOrders.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+      .addCase(getUserOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.orders = action.payload;
+        state.error = null;
+      })
+      .addCase(getUserOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.orders = [];
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(cancelOrder.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+      .addCase(cancelOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.order = action.payload;
+        state.error = null;
+      })
+      .addCase(cancelOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.order = null;
         state.error = action.payload;
       });
   },
