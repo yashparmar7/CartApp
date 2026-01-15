@@ -48,7 +48,8 @@ const getSellerOrders = async (req, res) => {
       "items.product": { $in: productIds },
     })
       .populate("user", "userName email")
-      .populate("items.product", "title image pricing.price");
+      .populate("items.product", "title image pricing.price")
+      .sort({ createdAt: -1 });
 
     res.status(200).json(orders);
   } catch (err) {

@@ -4,11 +4,16 @@ import {
   RiMoneyRupeeCircleLine,
 } from "react-icons/ri";
 
-import Loader from "../../components/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+
+import Loader from "../../components/Loader";
 import { getSellerMyProducts } from "../../features/product/productSlice";
 import { getSellerOrders } from "../../features/order/orderSlice";
+
+import RevenueChart from "../../components/RevenueChart";
+import OrdersStatusChart from "../../components/OrdersStatusChart";
+import MonthlyOrdersChart from "../../components/MonthlyOrdersChart";
 
 const SellerDashboard = () => {
   const dispatch = useDispatch();
@@ -41,29 +46,49 @@ const SellerDashboard = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {isLoading && <Loader />}
-      {stats.map(({ label, value, icon: Icon, highlight }) => (
-        <div
-          key={label}
-          className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm
-                     hover:shadow-md transition"
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-gray-500">{label}</p>
-            <Icon className="text-xl text-red-500" />
+    <>
+      {/* STATS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading && <Loader />}
+
+        {stats.map(({ label, value, icon: Icon, highlight }) => (
+          <div
+            key={label}
+            className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-500">{label}</p>
+              <Icon className="text-xl text-red-500" />
+            </div>
+
+            <h2
+              className={`mt-3 text-3xl font-bold ${
+                highlight ? "text-green-600" : "text-gray-800"
+              }`}
+            >
+              {value}
+            </h2>
+          </div>
+        ))}
+      </div>
+
+      {/* CHARTS */}
+      {orders?.length > 0 && (
+        <>
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <RevenueChart orders={orders} />
+            </div>
+
+            <OrdersStatusChart orders={orders} />
           </div>
 
-          <h2
-            className={`mt-3 text-3xl font-bold ${
-              highlight ? "text-green-600" : "text-gray-800"
-            }`}
-          >
-            {value}
-          </h2>
-        </div>
-      ))}
-    </div>
+          <div className="mt-6">
+            <MonthlyOrdersChart orders={orders} />
+          </div>
+        </>
+      )}
+    </>
   );
 };
 
