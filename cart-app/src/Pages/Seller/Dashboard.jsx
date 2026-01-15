@@ -8,14 +8,17 @@ import Loader from "../../components/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getSellerMyProducts } from "../../features/product/productSlice";
+import { getSellerOrders } from "../../features/order/orderSlice";
 
 const SellerDashboard = () => {
   const dispatch = useDispatch();
 
   const { myProducts, isLoading } = useSelector((state) => state.product);
+  const { orders } = useSelector((state) => state.order);
 
   useEffect(() => {
     dispatch(getSellerMyProducts());
+    dispatch(getSellerOrders());
   }, [dispatch]);
 
   const stats = [
@@ -26,7 +29,7 @@ const SellerDashboard = () => {
     },
     {
       label: "Orders",
-      value: 32,
+      value: orders?.length || 0,
       icon: RiShoppingBag3Line,
     },
     {

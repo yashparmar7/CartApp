@@ -200,7 +200,6 @@ const MyOrderPage = () => {
         </div>
       </section>
 
-      {/* CANCEL CONFIRMATION MODAL */}
       {cancelTarget && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4">
           <div className="bg-white rounded-2xl w-full max-w-md p-6">

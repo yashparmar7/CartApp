@@ -33,3 +33,8 @@ export const cancelOrderAPI = async (id) => {
   const res = await axiosInstance.put(`/order/cancelOrder/${id}`);
   return res;
 };
+
+export const getSellerOrdersAPI = async () => {
+  const res = await axiosInstance.get("/seller/getSellerOrders");
+  return res;
+};

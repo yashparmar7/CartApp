@@ -6,6 +6,7 @@ import {
   deleteOrderAPI,
   getUserOrdersAPI,
   cancelOrderAPI,
+  getSellerOrdersAPI,
 } from "./orderAPI";
 
 export const createOrder = createAsyncThunk(
@@ -87,6 +88,20 @@ export const cancelOrder = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to cancel order"
+      );
+    }
+  }
+);
+
+export const getSellerOrders = createAsyncThunk(
+  "order/getSellerOrders",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getSellerOrdersAPI();
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to get seller orders"
       );
     }
   }
@@ -224,6 +239,25 @@ const orderSlice = createSlice({
         state.loading = false;
         state.success = false;
         state.order = null;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(getSellerOrders.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+      .addCase(getSellerOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.orders = action.payload;
+        state.error = null;
+      })
+      .addCase(getSellerOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.orders = [];
         state.error = action.payload;
       });
   },

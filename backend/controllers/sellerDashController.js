@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const Order = require("../models/Order");
 
 const getMyProducts = async (req, res) => {
   try {
@@ -25,6 +26,34 @@ const getMyProducts = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Error in fetching seller products",
+      error: err.message,
+    });
+  }
+};
+
+const getSellerOrders = async (req, res) => {
+  try {
+    if (req.user.role !== "SELLER") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const sellerProducts = await Product.find({
+      seller: req.user._id,
+      isDeleted: false,
+    }).select("_id");
+
+    const productIds = sellerProducts.map((p) => p._id);
+
+    const orders = await Order.find({
+      "items.product": { $in: productIds },
+    })
+      .populate("user", "userName email")
+      .populate("items.product", "title image pricing.price");
+
+    res.status(200).json(orders);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error in fetching seller orders",
       error: err.message,
     });
   }
@@ -232,4 +261,10 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-module.exports = { getMyProducts, createProduct, updateProduct, deleteProduct };
+module.exports = {
+  getMyProducts,
+  getSellerOrders,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   getMyProducts,
+  getSellerOrders,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -10,6 +11,7 @@ const auth = require("../middleware/authMiddleware.js");
 const upload = require("../middleware/uploads");
 
 router.get("/getMyProducts", auth, getMyProducts);
+router.get("/getSellerOrders", auth, getSellerOrders);
 router.post(
   "/createProduct",
   auth,
