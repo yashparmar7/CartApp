@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
 import {
   RiShoppingCartFill,
   RiHeartLine,
@@ -17,6 +18,8 @@ import Loader from "./Loader";
 import { toast } from "react-hot-toast";
 
 const ProductDetailPage = () => {
+  const [activeImage, setActiveImage] = useState("");
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -26,9 +29,19 @@ const ProductDetailPage = () => {
   );
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
+  // useEffect(() => {
+  //   if (id) dispatch(getSingleProduct(id));
+  // }, [dispatch, id]);
+
   useEffect(() => {
     if (id) dispatch(getSingleProduct(id));
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (singleProduct?.image?.length > 0) {
+      setActiveImage(singleProduct.image[0]);
+    }
+  }, [singleProduct]);
 
   const handleAddToCart = (id) => {
     if (!isAuthenticated) {
@@ -69,10 +82,37 @@ const ProductDetailPage = () => {
           <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* IMAGE */}
-              <div className="w-full flex justify-center">
-                <div className="relative w-full max-w-lg aspect-square rounded-2xl bg-white border border-gray-200 overflow-hidden">
+              {/* IMAGE GALLERY */}
+              <div className="w-full flex flex-col sm:flex-row gap-4">
+                {/* Thumbnails */}
+                {singleProduct.image?.length > 1 && (
+                  <div className="flex sm:flex-col gap-3 order-2 sm:order-1 justify-center">
+                    {singleProduct.image.map((img, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setActiveImage(img)}
+                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl border overflow-hidden transition
+            ${
+              activeImage === img
+                ? "border-red-500 ring-2 ring-red-200"
+                : "border-gray-200 hover:border-gray-400"
+            }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`thumb-${index}`}
+                          className="w-full h-full object-contain p-1"
+                          draggable={false}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Main Image */}
+                <div className="relative w-full max-w-lg aspect-square rounded-2xl bg-white border border-gray-200 overflow-hidden order-1 sm:order-2">
                   <img
-                    src={singleProduct.image?.[0]}
+                    src={activeImage}
                     alt={singleProduct.title}
                     className="w-full h-full object-contain p-6 transition-transform duration-300 ease-out hover:scale-110"
                     loading="eager"
