@@ -56,6 +56,10 @@ const MyProducts = () => {
   });
 
   const [images, setImages] = useState([]);
+  const [activeImage, setActiveImage] = useState("");
+
+  const [existingImages, setExistingImages] = useState([]);
+  const [removedImages, setRemovedImages] = useState([]);
 
   const [isViewOpen, setIsViewOpen] = useState(false);
   const { singleProduct } = useSelector((state) => state.product);
@@ -78,6 +82,12 @@ const MyProducts = () => {
       dispatch(getAllCategories());
     }
   }, [dispatch, sellerProductsStatus, categoryStatus]);
+
+  useEffect(() => {
+    if (isViewOpen && singleProduct?.image?.length > 0) {
+      setActiveImage(singleProduct.image[0]);
+    }
+  }, [isViewOpen, singleProduct]);
 
   const handleCreateProduct = async (e) => {
     e.preventDefault();
@@ -111,6 +121,20 @@ const MyProducts = () => {
     }
   };
 
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setImages((prev) => [...prev, ...files]);
+  };
+
+  const removeNewImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (imgUrl) => {
+    setExistingImages((prev) => prev.filter((img) => img !== imgUrl));
+    setRemovedImages((prev) => [...prev, imgUrl]);
+  };
+
   const prepareEditPayload = (product) => ({
     title: product.title,
     brand: product.brand,
@@ -135,6 +159,8 @@ const MyProducts = () => {
     setIsEditOpen(false);
     setSelectedProduct(null);
     setImages([]);
+    setExistingImages([]);
+    setRemovedImages([]);
   };
 
   const handleSaveChanges = async () => {
@@ -149,6 +175,7 @@ const MyProducts = () => {
       id: selectedProduct._id,
       formData: payload,
       images: images,
+      removedImages: removedImages,
     };
 
     try {
@@ -338,6 +365,9 @@ const MyProducts = () => {
                 <button
                   onClick={() => {
                     setSelectedProduct(product);
+                    setExistingImages(product.image || []);
+                    setRemovedImages([]);
+                    setImages([]);
                     setIsEditOpen(true);
                   }}
                   className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
@@ -483,6 +513,9 @@ const MyProducts = () => {
                         <button
                           onClick={() => {
                             setSelectedProduct(product);
+                            setExistingImages(product.image || []);
+                            setRemovedImages([]);
+                            setImages([]);
                             setIsEditOpen(true);
                           }}
                           className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
@@ -511,6 +544,7 @@ const MyProducts = () => {
           </div>
         )}
       </div>
+
       {isCreateOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-3 sm:px-4">
           <div className="w-full max-w-lg sm:max-w-xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
@@ -739,15 +773,28 @@ const MyProducts = () => {
                     type="file"
                     multiple
                     accept="image/*"
-                    onChange={(e) => setImages([...e.target.files])}
+                    onChange={handleImageUpload}
                     className="hidden"
                   />
                 </label>
 
                 {images.length > 0 && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    {images.length} image(s) selected
-                  </p>
+                  <div className="flex flex-wrap gap-3 mt-5 ">
+                    {images.map((file, i) => (
+                      <div key={i} className="relative">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          className="w-16 h-16 rounded-lg object-cover border"
+                        />
+                        <button
+                          onClick={() => removeNewImage(i)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -981,19 +1028,26 @@ const MyProducts = () => {
               )}
 
               {/* EXISTING IMAGES */}
-              {selectedProduct.image?.length > 0 && (
+              {existingImages.length > 0 && (
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-gray-600">
                     Current Images
                   </label>
-                  <div className="flex gap-2 flex-wrap">
-                    {selectedProduct.image.map((img, i) => (
-                      <img
-                        key={i}
-                        src={img}
-                        alt=""
-                        className="w-14 h-14 rounded-lg object-cover border"
-                      />
+
+                  <div className="flex flex-wrap gap-3 pt-5">
+                    {existingImages.map((img, i) => (
+                      <div key={i} className="relative">
+                        <img
+                          src={img}
+                          className="w-16 h-16 rounded-lg object-cover border"
+                        />
+                        <button
+                          onClick={() => removeExistingImage(img)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -1012,10 +1066,28 @@ const MyProducts = () => {
                     type="file"
                     multiple
                     accept="image/*"
-                    onChange={(e) => setImages([...e.target.files])}
+                    onChange={handleImageUpload}
                     className="hidden"
                   />
                 </label>
+                {images.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mt-5">
+                    {images.map((file, i) => (
+                      <div key={i} className="relative">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          className="w-16 h-16 rounded-lg object-cover border"
+                        />
+                        <button
+                          onClick={() => removeNewImage(i)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1065,13 +1137,51 @@ const MyProducts = () => {
             {/* BODY */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* IMAGE (SINGLE – HERO STYLE) */}
-                <div className="flex justify-center items-start">
-                  <img
-                    src={singleProduct.image?.[0]}
-                    alt={singleProduct.title}
-                    className="w-full max-w-md h-64 sm:h-72 lg:h-full object-fill rounded-2xl border shadow-sm"
-                  />
+                {/* IMAGES (ALL IMAGES) */}
+                {/* IMAGES */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Product Images
+                  </h3>
+
+                  {/* MAIN IMAGE */}
+                  <div className="w-full aspect-square rounded-xl border bg-white overflow-hidden flex items-center justify-center">
+                    {activeImage ? (
+                      <img
+                        src={activeImage}
+                        alt={singleProduct.title}
+                        className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105"
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className="text-gray-400 text-sm">No image</div>
+                    )}
+                  </div>
+
+                  {/* THUMBNAILS */}
+                  {singleProduct.image?.length > 1 && (
+                    <div className="flex gap-3 flex-wrap">
+                      {singleProduct.image.map((img, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setActiveImage(img)}
+                          className={`w-16 h-16 rounded-lg border overflow-hidden transition
+            ${
+              activeImage === img
+                ? "border-red-500 ring-2 ring-red-200"
+                : "border-gray-200 hover:border-gray-400"
+            }`}
+                        >
+                          <img
+                            src={img}
+                            alt={`thumb-${index}`}
+                            className="w-full h-full object-contain p-1"
+                            draggable={false}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* DETAILS */}

@@ -152,7 +152,7 @@ export const createProduct = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   "product/updateProduct",
-  async ({ id, formData, images }, { rejectWithValue }) => {
+  async ({ id, formData, images, removedImages }, { rejectWithValue }) => {
     try {
       const fd = new FormData();
 
@@ -174,6 +174,10 @@ export const updateProduct = createAsyncThunk(
 
       images.forEach((img) => {
         fd.append("images", img);
+      });
+
+      removedImages.forEach((imgUrl) => {
+        fd.append("removedImages", imgUrl);
       });
 
       const res = await updateProductAPI(id, fd);

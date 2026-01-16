@@ -30,8 +30,10 @@ const SignupPage = () => {
     e.preventDefault();
     try {
       await dispatch(signup(formData)).unwrap();
-      toast.success("Signup successful!");
-      navigate("/");
+      toast.success(
+        "Signup successful! Please check your email to verify your account."
+      );
+      // Don't navigate immediately, let user verify email first
     } catch (err) {
       toast.error(err || "Signup failed");
     }

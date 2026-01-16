@@ -181,8 +181,20 @@ const updateProduct = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    // Handle images: append new images to existing ones
+    // Handle images: remove specified images and append new ones
     let updatedImages = existingProduct.image || [];
+
+    // Remove images that are in removedImages array
+    if (req.body.removedImages) {
+      const removedImages = Array.isArray(req.body.removedImages)
+        ? req.body.removedImages
+        : [req.body.removedImages];
+      updatedImages = updatedImages.filter(
+        (img) => !removedImages.includes(img)
+      );
+    }
+
+    // Append new images
     if (req.files?.length) {
       const newImages = req.files.map((file) => file.path);
       updatedImages = [...updatedImages, ...newImages];

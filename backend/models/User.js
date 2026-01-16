@@ -20,6 +20,12 @@ const UserSchema = new mongoose.Schema(
       enum: ["SUPERADMIN", "ADMIN", "SELLER", "USER"],
       default: "USER",
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerifyToken: String,
+    emailVerifyExpires: Date,
   },
   { timestamps: true }
 );

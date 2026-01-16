@@ -30,6 +30,8 @@ const Products = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const [activeImage, setActiveImage] = useState("");
+
   const [isViewOpen, setIsViewOpen] = useState(false);
   const { singleProduct } = useSelector((state) => state.product);
 
@@ -66,6 +68,12 @@ const Products = () => {
         toast.error(err || "Update failed");
       });
   };
+
+  useEffect(() => {
+    if (isViewOpen && singleProduct?.image?.length > 0) {
+      setActiveImage(singleProduct.image[0]);
+    }
+  }, [isViewOpen, singleProduct]);
 
   const handleDeleteProduct = (id) => {
     Swal.fire({
@@ -552,12 +560,50 @@ const Products = () => {
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* IMAGE (SINGLE – HERO STYLE) */}
-                <div className="flex justify-center items-start">
-                  <img
-                    src={singleProduct.image?.[0]}
-                    alt={singleProduct.title}
-                    className="w-full max-w-md h-64 sm:h-72 lg:h-full object-fill rounded-2xl border shadow-sm"
-                  />
+                {/* IMAGES */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Product Images
+                  </h3>
+
+                  {/* MAIN IMAGE */}
+                  <div className="w-full aspect-square rounded-xl border bg-white overflow-hidden flex items-center justify-center">
+                    {activeImage ? (
+                      <img
+                        src={activeImage}
+                        alt={singleProduct.title}
+                        className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105"
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className="text-gray-400 text-sm">No image</div>
+                    )}
+                  </div>
+
+                  {/* THUMBNAILS */}
+                  {singleProduct.image?.length > 1 && (
+                    <div className="flex gap-3 flex-wrap">
+                      {singleProduct.image.map((img, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setActiveImage(img)}
+                          className={`w-16 h-16 rounded-lg border overflow-hidden transition
+            ${
+              activeImage === img
+                ? "border-red-500 ring-2 ring-red-200"
+                : "border-gray-200 hover:border-gray-400"
+            }`}
+                        >
+                          <img
+                            src={img}
+                            alt={`thumb-${index}`}
+                            className="w-full h-full object-contain p-1"
+                            draggable={false}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* DETAILS */}
