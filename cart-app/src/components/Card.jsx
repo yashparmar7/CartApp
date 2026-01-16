@@ -21,11 +21,7 @@ const Card = () => {
   );
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  useEffect(() => {
-    if (productsStatus === "idle") {
-      dispatch(getAllProducts());
-    }
-  }, [dispatch, productsStatus]);
+  // Removed automatic dispatch of getAllProducts - now handled by ShopPage
 
   const handleAddToCart = (e, id) => {
     e.stopPropagation();
@@ -119,7 +115,6 @@ const Card = () => {
 
                   <p className="text-[11px] text-green-600">Free Delivery</p>
 
-                  {/* Spacer */}
                   <div className="flex-1" />
 
                   {/* Button */}

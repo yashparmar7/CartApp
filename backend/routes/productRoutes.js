@@ -6,6 +6,7 @@ const {
   createCategory,
   getAllProducts,
   getSingleProduct,
+  searchProducts,
 } = require("../controllers/productController");
 const auth = require("../middleware/authMiddleware.js");
 
@@ -14,5 +15,7 @@ router.post("/createCategory", auth, createCategory);
 
 router.get("/getAllProducts", getAllProducts);
 router.get("/getSingleProduct/:id", auth, getSingleProduct);
+
+router.get("/searchProducts", searchProducts);
 
 module.exports = router;

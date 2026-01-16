@@ -78,9 +78,44 @@ const getSingleProduct = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  const { query, category } = req.query;
+  try {
+    let filter = { isActive: true, stock: { $gt: 0 } };
+
+    if (category && category !== "") {
+      const categoryDoc = await Category.findOne({
+        name: new RegExp(`^${category}$`, "i"),
+      });
+      if (categoryDoc) {
+        filter.category = categoryDoc._id;
+      }
+    }
+
+    let products = await Product.find(filter)
+      .populate("category", "name")
+      .sort({ createdAt: -1 })
+      .exec();
+
+    if (query && query.trim() !== "") {
+      products = products.filter((product) =>
+        product.title.toLowerCase().includes(query.toLowerCase().trim())
+      );
+    }
+
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error in fetching products",
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   createCategory,
   getAllProducts,
   getSingleProduct,
+  searchProducts,
 };

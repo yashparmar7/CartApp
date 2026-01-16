@@ -37,7 +37,7 @@ const RevenueChart = ({ orders }) => {
     scales: {
       x: { grid: { display: false } },
       y: {
-        ticks: {
+        ticks: {  
           callback: (value) => `₹${value}`,
         },
       },

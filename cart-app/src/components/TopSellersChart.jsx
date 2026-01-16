@@ -25,7 +25,7 @@ const TopSellersChart = ({ orders }) => {
   };
 
   return (
-    <div className="bg-white border rounded-xl p-5 shadow-sm">
+    <div className="bg-white border border-gray-200  rounded-xl p-5 shadow-sm">
       <h3 className="text-sm font-semibold mb-4 text-gray-700">
         Top Sellers (Revenue)
       </h3>

@@ -5,6 +5,7 @@ import { HiOutlineLogout } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync } from "../features/auth/authSlice";
 import toast from "react-hot-toast";
+import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -36,7 +37,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* ===== HEADER ===== */}
       <header className="sticky top-0 z-50 bg-gray-50 shadow">
         <div className="container mx-auto flex items-center p-5">
           {/* Logo */}
@@ -60,22 +60,37 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex md:ml-auto md:mr-auto font-semibold">
-            <Link className="mr-8 hover:text-red-500" to="/">
+          <nav className="hidden md:flex items-center gap-8 ml-auto font-semibold text-md">
+            <Link className="hover:text-red-500 transition-colors" to="/">
               Home
             </Link>
-            <Link className="mr-8 hover:text-red-500" to="/shop">
+
+            <Link className="hover:text-red-500 transition-colors" to="/shop">
               Shop
             </Link>
-            <Link className="mr-8 hover:text-red-500" to="/my-orders">
+
+            <Link
+              className="hover:text-red-500 transition-colors"
+              to="/my-orders"
+            >
               My Orders
             </Link>
-            <Link className="mr-8 hover:text-red-500" to="/about">
+
+            <Link className="hover:text-red-500 transition-colors" to="/about">
               About
             </Link>
-            <Link className="mr-8 hover:text-red-500" to="/contact">
+
+            <Link
+              className="hover:text-red-500 transition-colors"
+              to="/contact"
+            >
               Contact
             </Link>
+
+            {/* Search should feel like a component, not a link */}
+            <div className="ml-4">
+              <SearchBar />
+            </div>
           </nav>
 
           {/* Right Side */}
@@ -177,6 +192,10 @@ const Navbar = () => {
           <button onClick={() => setOpen(false)}>
             <IoClose size={22} />
           </button>
+        </div>
+
+        <div className="px-4 py-3 border-b border-gray-300">
+          <SearchBar />
         </div>
 
         <nav className="flex flex-col">

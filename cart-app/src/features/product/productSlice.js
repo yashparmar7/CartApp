@@ -9,6 +9,7 @@ import {
   createProductAPI,
   updateProductAPI,
   deleteProductAPI,
+  searchProductsAPI,
 } from "./productAPI";
 
 export const getAllProducts = createAsyncThunk(
@@ -93,6 +94,20 @@ export const getSellerMyProducts = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to fetch products"
+      );
+    }
+  }
+);
+
+export const searchProducts = createAsyncThunk(
+  "product/searchProducts",
+  async ({ query, category }, { rejectWithValue }) => {
+    try {
+      const res = await searchProductsAPI(query, category);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to search products"
       );
     }
   }
@@ -349,6 +364,19 @@ export const productSlice = createSlice({
         );
       })
       .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(searchProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products = action.payload;
+      })
+      .addCase(searchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

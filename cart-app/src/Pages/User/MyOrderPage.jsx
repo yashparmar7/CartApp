@@ -3,7 +3,6 @@ import Navbar from "../../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserOrders, cancelOrder } from "../../features/order/orderSlice";
 import Loader from "../../components/Loader";
-import Footer from "../../components/Footer";
 import { FaPhoneAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 
@@ -229,8 +228,6 @@ const MyOrderPage = () => {
           </div>
         </div>
       )}
-
-      <Footer />
     </>
   );
 };

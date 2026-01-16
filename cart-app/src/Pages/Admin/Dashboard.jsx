@@ -1,11 +1,12 @@
 import { RiBox3Line, RiShoppingBag3Line, RiUser3Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { getAllProductsAdmin } from "../../features/product/productSlice";
 import { fetchSellerRequests } from "../../features/sellerRequest/sellerRequestSlice";
 import { getAllOrders } from "../../features/order/orderSlice";
 
+import DateRangeSwitch from "../../components/DateRangeSwitch";
 import RevenueChart from "../../components/RevenueChart";
 import OrdersStatusChart from "../../components/OrdersStatusChart";
 import MonthlyOrdersChart from "../../components/MonthlyOrdersChart";
@@ -14,6 +15,8 @@ import ProductsOrdersChart from "../../components/ProductsOrdersChart";
 import OrdersTrendChart from "../../components/OrdersTrendChart";
 import RevenueByMonthChart from "../../components/RevenueByMonthChart";
 import OrderStatusBreakdown from "../../components/OrderStatusBreakdown";
+import TopProductsChart from "../../components/TopProductsChart";
+import TopSellersChart from "../../components/TopSellersChart";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -21,6 +24,8 @@ const AdminDashboard = () => {
   const { products } = useSelector((state) => state.product);
   const { requests } = useSelector((state) => state.sellerRequest);
   const { orders } = useSelector((state) => state.order);
+
+  const [range, setRange] = useState(30);
 
   useEffect(() => {
     dispatch(getAllProductsAdmin());
@@ -30,6 +35,20 @@ const AdminDashboard = () => {
 
   const approvedSellers =
     requests?.filter((r) => r.status === "APPROVED") || [];
+
+  const filteredOrders = useMemo(() => {
+    if (!orders || orders.length === 0) return [];
+
+    const now = new Date();
+
+    return orders.filter((order) => {
+      const orderDate = new Date(order.createdAt);
+      const diffDays =
+        (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
+
+      return diffDays <= range;
+    });
+  }, [orders, range]);
 
   const stats = [
     {
@@ -44,7 +63,7 @@ const AdminDashboard = () => {
     },
     {
       label: "Total Orders",
-      value: orders?.length || 0,
+      value: filteredOrders.length,
       icon: RiShoppingBag3Line,
     },
   ];
@@ -68,29 +87,51 @@ const AdminDashboard = () => {
         ))}
       </div>
 
+      {/* RANGE SWITCH */}
+      <div className="mt-10 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Analytics Overview
+          </h2>
+          <p className="text-sm text-gray-500">
+            Overview of key metrics and statistics
+          </p>
+        </div>
+
+        <DateRangeSwitch value={range} onChange={setRange} />
+      </div>
+
       {/* ANALYTICS */}
-      {orders?.length > 0 && (
+      {filteredOrders.length > 0 && (
         <>
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <RevenueChart orders={orders} />
+              <RevenueChart orders={filteredOrders} />
             </div>
-            <OrdersStatusChart orders={orders} />
+            <OrdersTrendChart orders={filteredOrders} />
           </div>
 
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <OrdersTrendChart orders={orders} />
-            <RevenueByMonthChart orders={orders} />
-            <OrderStatusBreakdown orders={orders} />
+            <OrdersStatusChart orders={filteredOrders} />
+            <OrderStatusBreakdown orders={filteredOrders} />
+            <MonthlyOrdersChart orders={filteredOrders} />
           </div>
 
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <SellerRequestStatusChart requests={requests} />
+            <RevenueByMonthChart orders={filteredOrders} />
             <ProductsOrdersChart
               productsCount={products?.length || 0}
-              ordersCount={orders?.length || 0}
+              ordersCount={filteredOrders.length}
             />
-            <MonthlyOrdersChart orders={orders} />
+            <SellerRequestStatusChart requests={requests} />
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <TopProductsChart products={products} orders={filteredOrders} />
+            <TopSellersChart
+              sellers={approvedSellers}
+              orders={filteredOrders}
+            />
           </div>
         </>
       )}

@@ -88,3 +88,16 @@ export const deleteProductAPI = (id) => {
     console.log(err);
   }
 };
+
+export const searchProductsAPI = (query, category) => {
+  try {
+    const res = axiosInstance.get(
+      `/products/searchProducts?query=${encodeURIComponent(
+        query
+      )}&category=${encodeURIComponent(category)}`
+    );
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
