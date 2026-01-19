@@ -1,50 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { sendEmail, sendVerificationEmail } = require("../utils/sendEmail");
 const crypto = require("crypto");
-
-// const signupController = async (req, res) => {
-//   const { userName, email, password } = req.body;
-
-//   try {
-//     if (!userName || !email || !password) {
-//       return res.status(400).json({ error: "All fields are required" });
-//     }
-
-//     const existingUser = await User.findOne({ email });
-//     if (existingUser) {
-//       return res.status(400).json({ error: "Email already exists" });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     const user = await User.create({
-//       userName,
-//       email,
-//       password: hashedPassword,
-//     });
-
-//     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-//       expiresIn: "1d",
-//     });
-
-//     res.status(201).json({
-//       message: "User created successfully",
-//       user: {
-//         id: user._id,
-//         userName: user.userName,
-//         email: user.email,
-//         role: user.role,
-//       },
-//       token,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       message: error.message,
-//     });
-//   }
-// };
+const { sendEmail, sendVerificationEmail } = require("../utils/sendEmail");
 
 const signupController = async (req, res) => {
   const { userName, email, password } = req.body;
@@ -67,19 +25,33 @@ const signupController = async (req, res) => {
       userName,
       email,
       password: hashedPassword,
+      isVerified: false,
       emailVerifyToken: verifyToken,
-      emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000, // 24h
+      emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
 
-    const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${verifyToken}`;
+    if (!process.env.CLIENT_URL) {
+      throw new Error("CLIENT_URL is missing in environment variables");
+    }
 
-    await sendVerificationEmail(email, userName, verifyUrl);
+    const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${verifyToken}`;
 
     res.status(201).json({
       message: "Signup successful. Please verify your email.",
     });
+
+    sendVerificationEmail(email, userName, verifyUrl)
+      .then(() => {
+        console.log("Verification email sent to:", email);
+      })
+      .catch((err) => {
+        console.error("EMAIL ERROR:", err);
+      });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("SIGNUP ERROR:", error);
+    res.status(500).json({
+      error: error.message || "Server error",
+    });
   }
 };
 
@@ -93,17 +65,25 @@ const verifyEmailController = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ error: "Invalid or expired token" });
+      return res.status(400).json({
+        error: "Invalid or expired verification token",
+      });
     }
 
     user.isVerified = true;
     user.emailVerifyToken = undefined;
     user.emailVerifyExpires = undefined;
+
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully" });
+    res.status(200).json({
+      message: "Email verified successfully",
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("VERIFY EMAIL ERROR:", error);
+    res.status(500).json({
+      error: error.message || "Server error",
+    });
   }
 };
 
@@ -121,22 +101,41 @@ const resendVerificationEmailController = async (req, res) => {
     }
 
     if (user.isVerified) {
-      return res.status(400).json({ error: "Email is already verified" });
+      return res.status(400).json({
+        error: "Email already verified",
+      });
     }
 
     const verifyToken = crypto.randomBytes(32).toString("hex");
+
     user.emailVerifyToken = verifyToken;
-    user.emailVerifyExpires = Date.now() + 24 * 60 * 60 * 1000; // 24h
+    user.emailVerifyExpires = Date.now() + 24 * 60 * 60 * 1000;
+
     await user.save();
+
+    if (!process.env.CLIENT_URL) {
+      throw new Error("CLIENT_URL is missing in environment variables");
+    }
 
     const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${verifyToken}`;
 
-    await sendVerificationEmail(email, user.userName, verifyUrl);
+    res.status(200).json({
+      message: "Verification email sent successfully",
+    });
 
-    res.status(200).json({ message: "Verification email sent successfully" });
+    // Send email async
+    sendVerificationEmail(email, user.userName, verifyUrl)
+      .then(() => {
+        console.log("Resent verification email to:", email);
+      })
+      .catch((err) => {
+        console.error("RESEND EMAIL ERROR:", err);
+      });
   } catch (error) {
-    console.error("Resend verification error:", error);
-    res.status(500).json({ message: "Failed to send verification email" });
+    console.error("RESEND VERIFY ERROR:", error);
+    res.status(500).json({
+      error: error.message || "Server error",
+    });
   }
 };
 
@@ -164,6 +163,10 @@ const loginController = async (req, res) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is missing in environment variables");
+    }
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
@@ -179,9 +182,9 @@ const loginController = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error(error);
+    console.error("LOGIN ERROR:", error);
     res.status(500).json({
-      message: error.message,
+      error: error.message || "Server error",
     });
   }
 };
@@ -192,16 +195,17 @@ const logoutController = async (req, res) => {
       message: "Logout successful",
     });
   } catch (error) {
+    console.error("LOGOUT ERROR:", error);
     res.status(500).json({
-      message: "Server error",
+      error: "Server error",
     });
   }
 };
 
 module.exports = {
   signupController,
-  loginController,
-  logoutController,
   verifyEmailController,
   resendVerificationEmailController,
+  loginController,
+  logoutController,
 };
