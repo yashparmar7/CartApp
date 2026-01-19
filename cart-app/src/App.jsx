@@ -41,6 +41,7 @@ import Sellers from "./Pages/SuperAdmin/Sellers";
 import OrdersPage from "./Pages/SuperAdmin/Orders";
 import CheckoutPage from "./Pages/User/CheckoutPage";
 import MyOrderPage from "./Pages/User/MyOrderPage";
+import VerifyEmail from "./Pages/User/VerifyEmailPage";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
 
