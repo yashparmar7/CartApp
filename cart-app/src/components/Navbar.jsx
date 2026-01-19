@@ -242,26 +242,6 @@ const Navbar = () => {
             Cart
           </Link>
 
-          {user?.role === "USER" ? (
-            <Link
-              to="/become-seller"
-              className=" text-red-500
-    py-3 px-4 rounded font-semibold
-    hover:bg-red-500 hover:text-white transition"
-            >
-              Become a Seller
-            </Link>
-          ) : (
-            <Link
-              to={getDashboardPath(user?.role)}
-              className=" text-red-600
-    py-3 px-4 rounded font-semibold
-    hover:bg-red-500 hover:text-white transition"
-            >
-              Go to Dashboard
-            </Link>
-          )}
-
           {!user ? (
             <>
               <Link
@@ -280,12 +260,34 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            <button
-              onClick={handleLogout}
-              className="px-4 py-3 text-left text-red-500 font-semibold"
-            >
-              Logout
-            </button>
+            <>
+              {user?.role === "USER" ? (
+                <Link
+                  to="/become-seller"
+                  className=" text-red-500
+    py-3 px-4 rounded font-semibold
+    hover:bg-red-500 hover:text-white transition"
+                >
+                  Become a Seller
+                </Link>
+              ) : (
+                <Link
+                  to={getDashboardPath(user?.role)}
+                  className=" text-red-600
+    py-3 px-4 rounded font-semibold
+    hover:bg-red-500 hover:text-white transition"
+                >
+                  Go to Dashboard
+                </Link>
+              )}
+
+              <button
+                onClick={handleLogout}
+                className="px-4 py-3 text-left text-red-500 font-semibold"
+              >
+                Logout
+              </button>
+            </>
           )}
         </nav>
       </div>
