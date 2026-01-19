@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyEmail } from "../../features/auth/authSlice";
@@ -10,9 +10,14 @@ const VerifyEmailPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
-  const [verificationStatus, setVerificationStatus] = useState(null); // 'success', 'error', or null
+  const [verificationStatus, setVerificationStatus] = useState(null);
+
+  const hasVerified = useRef(false);
 
   useEffect(() => {
+    if (!token || hasVerified.current) return;
+
+    hasVerified.current = true;
     const verifyToken = async () => {
       try {
         await dispatch(verifyEmail(token)).unwrap();
@@ -23,7 +28,11 @@ const VerifyEmailPage = () => {
         }, 3000);
       } catch (err) {
         setVerificationStatus("error");
-        toast.error(err || "Email verification failed");
+        const errorMessage =
+          typeof err === "string"
+            ? err
+            : err?.error || err?.message || "Email verification failed";
+        toast.error(errorMessage);
       }
     };
 
@@ -66,7 +75,11 @@ const VerifyEmailPage = () => {
                 Verification Failed
               </h2>
               <p className="text-gray-600 mb-6">
-                {error || "The verification link is invalid or has expired."}
+                {typeof error === "string"
+                  ? error
+                  : error?.error ||
+                    error?.message ||
+                    "The verification link is invalid or has expired."}
               </p>
               <button
                 onClick={() => navigate("/login")}

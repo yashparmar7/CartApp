@@ -66,7 +66,15 @@ export const resendVerificationEmail = createAsyncThunk(
   },
 );
 
-const userFromLocalStorage = JSON.parse(localStorage.getItem("user"));
+let userFromLocalStorage = null;
+const userStr = localStorage.getItem("user");
+if (userStr && userStr !== "undefined" && userStr !== "null") {
+  try {
+    userFromLocalStorage = JSON.parse(userStr);
+  } catch {
+    localStorage.removeItem("user");
+  }
+}
 const tokenFromLocalStorage = localStorage.getItem("token");
 
 const initialState = {
@@ -138,7 +146,7 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyEmail.fulfilled, (state, action) => {
+      .addCase(verifyEmail.fulfilled, (state) => {
         state.loading = false;
         // Email verification doesn't return user/token, just success message
       })

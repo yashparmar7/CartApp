@@ -34,7 +34,7 @@ const sendVerificationEmail = async (email, userName, verifyUrl) => {
         <!-- Body -->
         <div style="padding:28px;color:#374151;">
           <h2 style="margin-top:0;font-size:18px;">
-            Hey ${userName} 👋
+            Hey ${userName}
           </h2>
 
           <p style="font-size:14px;line-height:1.6;">
