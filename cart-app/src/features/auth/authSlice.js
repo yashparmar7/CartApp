@@ -1,5 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { signupAPI, loginAPI, logoutAPI } from "./authAPI";
+import {
+  signupAPI,
+  loginAPI,
+  logoutAPI,
+  verifyEmailAPI,
+  resendVerificationEmailAPI,
+} from "./authAPI";
 
 export const signup = createAsyncThunk(
   "auth/signup",
@@ -10,7 +16,7 @@ export const signup = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || "Signup failed");
     }
-  }
+  },
 );
 
 export const login = createAsyncThunk(
@@ -22,7 +28,7 @@ export const login = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || "Login failed");
     }
-  }
+  },
 );
 
 export const logoutAsync = createAsyncThunk("auth/logout", async () => {
@@ -32,6 +38,33 @@ export const logoutAsync = createAsyncThunk("auth/logout", async () => {
     console.warn("Logout API failed:", error);
   }
 });
+
+export const verifyEmail = createAsyncThunk(
+  "auth/verifyEmail",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await verifyEmailAPI(data);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Email verification failed",
+      );
+    }
+  },
+);
+export const resendVerificationEmail = createAsyncThunk(
+  "auth/resendVerificationEmail",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await resendVerificationEmailAPI(data);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Resend verification email failed",
+      );
+    }
+  },
+);
 
 const userFromLocalStorage = JSON.parse(localStorage.getItem("user"));
 const tokenFromLocalStorage = localStorage.getItem("token");
@@ -98,6 +131,38 @@ const authSlice = createSlice({
         state.token = null;
         localStorage.removeItem("user");
         localStorage.removeItem("token");
+      });
+    // verify email
+    builder
+      .addCase(verifyEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyEmail.fulfilled, (state, action) => {
+        state.loading = false;
+        // Email verification doesn't return user/token, just success message
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    // resend verification email
+    builder
+      .addCase(resendVerificationEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resendVerificationEmail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("token", action.payload.token);
+      })
+      .addCase(resendVerificationEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
