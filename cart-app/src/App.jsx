@@ -22,7 +22,7 @@ import BecomeSeller from "./Pages/User/BecomeSeller";
 import PageNotFound from "./Pages/User/PageNotFound";
 import CheckoutPage from "./Pages/User/CheckoutPage";
 import MyOrderPage from "./Pages/User/MyOrderPage";
-import VerifyEmail from "./Pages/User/VerifyEmailPage";
+// import VerifyEmail from "./Pages/User/VerifyEmailPage";
 
 /* Dashboards */
 import AdminDashboard from "./Pages/Admin/Dashboard";
@@ -53,7 +53,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/verify-email/:token" element={<VerifyEmail />} />
+          {/* <Route path="/verify-email/:token" element={<VerifyEmail />} /> */}
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/shop" element={<ShopPage />} />

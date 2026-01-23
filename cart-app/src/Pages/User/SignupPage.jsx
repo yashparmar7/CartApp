@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../../features/auth/authSlice";
 import toast from "react-hot-toast";
@@ -19,7 +19,7 @@ const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
 
   const handleChange = (e) => {
@@ -28,10 +28,11 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await dispatch(signup(formData)).unwrap();
-      toast.success("Signup successful! Please check your email to verify.");
-      // Note: You can navigate to a 'verify-email' page here if you have one
+      toast.success("Signup successful");
+      navigate("/login"); 
     } catch (err) {
       toast.error(err || "Signup failed");
     }
