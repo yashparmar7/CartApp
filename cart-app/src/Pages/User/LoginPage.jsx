@@ -32,7 +32,7 @@ const LoginPage = () => {
       else if (role === "SUPERADMIN") navigate("/superadmin");
       else navigate("/");
     } catch (err) {
-      toast.error(err || "Login failed");
+      toast.error(err?.error || err || "Login failed");
     }
   };
 

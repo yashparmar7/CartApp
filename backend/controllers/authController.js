@@ -149,7 +149,7 @@ const loginController = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ error: "User does not exist" });
+      return res.status(400).json({ error: "invalid credential" });
     }
 
     if (!user.isVerified) {
@@ -160,7 +160,7 @@ const loginController = async (req, res) => {
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return res.status(400).json({ error: "invalid credential" });
     }
 
     if (!process.env.JWT_SECRET) {
