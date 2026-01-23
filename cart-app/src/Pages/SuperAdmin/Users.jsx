@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { RiDeleteBin6Line, RiEdit2Line } from "react-icons/ri";
+import { RiDeleteBin6Line, RiEdit2Line, RiErrorWarningFill, RiGroupFill, RiShieldUserFill } from "react-icons/ri";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "../../components/Loader";
 import {
@@ -73,94 +73,137 @@ const Users = () => {
   return (
     <>
       <div className="p-4 sm:p-6">
-        <h1 className="text-xl sm:text-2xl font-semibold mb-6">
-          Users Management
-        </h1>
+        {/* ===================== COMMAND BAR HEADER (USER MANAGEMENT) ===================== */}
+<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+  {/* Left Side: Module Identity */}
+  <div className="flex items-center gap-4">
+    <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 shrink-0">
+      <RiGroupFill size={24} />
+    </div>
+    <div>
+      <h1 className="text-2xl font-black text-gray-900 tracking-tight uppercase leading-none">
+        User <span className="text-red-500">Directory</span>
+      </h1>
+      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">
+        Access Control & Identity Management
+      </p>
+    </div>
+  </div>
 
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+  {/* Right Side: Platform Population Metrics */}
+  <div className="flex items-center gap-3">
+    {/* Secondary Stat: Role Breakdown Context */}
+    <div className="hidden sm:flex flex-col items-end px-4 border-r border-gray-100">
+       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Platform Growth</p>
+       <p className="text-sm font-black text-gray-900">
+         {users?.length || 0} <span className="text-[10px] opacity-60 uppercase">Profiles</span>
+       </p>
+    </div>
 
-        <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+    {/* Primary Metric Badge */}
+    <div className="bg-red-50 px-5 py-2.5 rounded-2xl border border-red-100 flex items-center gap-3 transition-all hover:bg-red-100 group">
+      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition-transform">
+        <RiShieldUserFill size={18} />
+      </div>
+      <div>
+        <p className="text-[9px] font-black text-red-600 uppercase tracking-[0.1em] leading-none">Global Access</p>
+        <p className="text-lg font-black text-red-700 mt-0.5 leading-none uppercase">
+          Verified <span className="text-[10px] font-bold opacity-60">Status</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{/* ===================== CONSISTENT ERROR STATE ===================== */}
+{error && (
+  <div className="mb-8 flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl animate-in shake duration-500">
+    <RiErrorWarningFill className="text-xl shrink-0" />
+    <p className="text-xs font-black uppercase tracking-wide">{error}</p>
+  </div>
+)}
+
+       {/* ===================== TABLE CONTAINER (DESKTOP) ===================== */}
+      <div className="hidden lg:block bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto custom-scrollbar">
           {loading ? (
-            <div className="p-6 text-center">
+            <div className="p-20 text-center">
               <Loader />
             </div>
           ) : (
-            <table className="w-full text-sm">
-              <thead className="hidden sm:table-header-group bg-gradient-to-r from-orange-600 to-red-600 text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium">UserName</th>
-                  <th className="px-4 py-3 text-left font-medium">Email</th>
-                  <th className="px-4 py-3 text-left font-medium">Role</th>
-                  <th className="px-4 py-3 text-center font-medium">Action</th>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100">
+                  {[
+                    "User Identity",
+                    "Electronic Mail",
+                    "Access Privilege",
+                    "Account Actions"
+                  ].map((header) => (
+                    <th key={header} className="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
+                      {header}
+                    </th>
+                  ))}
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody className="divide-y divide-gray-50 font-medium text-sm">
                 {users.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="4"
-                      className="px-4 py-6 text-center text-gray-500"
-                    >
-                      No users found
+                    <td colSpan="4" className="py-20 text-center bg-gray-50/30">
+                      <p className="text-gray-400 font-black uppercase tracking-widest text-sm italic">
+                        No User Records Found
+                      </p>
                     </td>
                   </tr>
                 ) : (
                   users.map((user) => (
-                    <tr
-                      key={user._id}
-                      className="border-b last:border-b-0 block sm:table-row hover:bg-indigo-50/60 transition"
-                    >
-                      {/* USERNAME */}
-                      <td
-                        data-label="Username"
-                        className="px-4 py-3 block sm:table-cell text-right sm:text-left
-                        before:content-[attr(data-label)] before:float-left before:font-medium
-                        before:text-gray-500 sm:before:hidden"
-                      >
-                        {user.userName}
+                    <tr key={user._id} className="hover:bg-gray-50/50 transition-all duration-200 group">
+                      {/* Username */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 border border-red-100 font-black text-xs">
+                            {user.userName.charAt(0).toUpperCase()}
+                          </div>
+                          <p className="text-sm font-black text-gray-900 uppercase tracking-tight group-hover:text-red-500 transition-colors">
+                            {user.userName}
+                          </p>
+                        </div>
                       </td>
 
-                      {/* EMAIL */}
-                      <td
-                        data-label="Email"
-                        className="px-4 py-3 block sm:table-cell text-right sm:text-left break-all
-                        before:content-[attr(data-label)] before:float-left before:font-medium
-                        before:text-gray-500 sm:before:hidden"
-                      >
-                        {user.email}
+                      {/* Email */}
+                      <td className="px-6 py-4">
+                        <p className="text-xs font-bold text-gray-500 italic">{user.email}</p>
                       </td>
 
-                      {/* ROLE */}
-                      <td
-                        data-label="Role"
-                        className="px-4 py-3 block sm:table-cell text-right sm:text-left
-                        before:content-[attr(data-label)] before:float-left before:font-medium
-                        before:text-gray-500 sm:before:hidden"
-                      >
-                        {user.role}
+                      {/* Role */}
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase border tracking-widest
+                          ${user.role === "ADMIN" || user.role === "SUPERADMIN" 
+                            ? "bg-gray-900 text-white border-gray-900" 
+                            : user.role === "SELLER" 
+                            ? "bg-red-50 text-red-600 border-red-200" 
+                            : "bg-blue-50 text-blue-600 border-blue-200"}`}>
+                          {user.role}
+                        </span>
                       </td>
 
-                      {/* ACTION */}
-                      <td
-                        data-label="Action"
-                        className="px-4 py-3 block sm:table-cell text-right sm:text-center
-                        before:content-[attr(data-label)] before:float-left before:font-medium
-                        before:text-gray-500 sm:before:hidden"
-                      >
-                        <div className="flex justify-end sm:justify-center gap-2">
-                          <button
-                            onClick={() => openEditModal(user)}
-                            className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white"
+                      {/* Row Actions */}
+                      <td className="px-6 py-4">
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => openEditModal(user)} 
+                            title="Edit Permissions"
+                            className="p-2.5 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm"
                           >
-                            <RiEdit2Line />
+                            <RiEdit2Line size={18} />
                           </button>
-
-                          <button
-                            onClick={() => handleDeleteUser(user._id)}
-                            className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-red-600 hover:text-white"
+                          <button 
+                            onClick={() => handleDeleteUser(user._id)} 
+                            title="Delete User"
+                            className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
                           >
-                            <RiDeleteBin6Line />
+                            <RiDeleteBin6Line size={18} />
                           </button>
                         </div>
                       </td>
@@ -171,24 +214,76 @@ const Users = () => {
             </table>
           )}
         </div>
+      </div>
 
-        {totalPages > 1 && (
-          <div className="mt-6 flex justify-center gap-2">
+      {/* ===================== MOBILE LIST VIEW (REDESIGNED) ===================== */}
+      <div className="lg:hidden space-y-4">
+        {loading ? (
+          <div className="py-10 text-center"><Loader /></div>
+        ) : users.length === 0 ? (
+          <div className="bg-white rounded-[2rem] p-12 text-center border border-dashed border-gray-200">
+            <p className="text-gray-400 font-bold tracking-tight">Zero members found.</p>
+          </div>
+        ) : (
+          users.map((user) => (
+            <div
+              key={user._id}
+              className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm transition-all active:scale-[0.98]"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center border border-red-100 font-black">
+                    {user.userName.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">{user.userName}</h3>
+                    <p className="text-[10px] text-gray-400 font-bold mt-0.5 italic">{user.email}</p>
+                  </div>
+                </div>
+                <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border
+                  ${user.role === "SELLER" ? "bg-red-50 text-red-600 border-red-100" : "bg-blue-50 text-blue-600 border-blue-100"}`}>
+                  {user.role}
+                </span>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-50 flex gap-2">
+                <button 
+                  onClick={() => openEditModal(user)} 
+                  className="flex-1 py-3 bg-gray-50 text-gray-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                >
+                  <RiEdit2Line /> Modify Role
+                </button>
+                <button 
+                  onClick={() => handleDeleteUser(user._id)} 
+                  className="w-12 h-12 bg-gray-50 text-rose-600 rounded-2xl flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all shadow-inner"
+                >
+                  <RiDeleteBin6Line size={18} />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ===================== PAGINATION (REDESIGNED) ===================== */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-8 animate-in slide-in-from-bottom-2 duration-500">
+          <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm">
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`px-3 py-1 rounded-lg border text-sm transition ${
-                  currentPage === i + 1
-                    ? "bg-red-600 text-white border-red-600"
-                    : "hover:bg-red-50 text-gray-700"
-                }`}
+                className={`w-10 h-10 rounded-xl font-black text-[11px] transition-all duration-300
+                  ${currentPage === i + 1 
+                    ? "bg-red-500 text-white shadow-lg shadow-red-100 scale-105" 
+                    : "bg-transparent text-gray-400 hover:text-red-500 hover:bg-red-50"}`}
               >
-                {i + 1}
+                {String(i + 1).padStart(2, '0')}
               </button>
             ))}
           </div>
-        )}
+        </div>
+      )}
       </div>
 
       {/* ================= EDIT ROLE MODAL ================= */}

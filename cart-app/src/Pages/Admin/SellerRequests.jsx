@@ -14,6 +14,11 @@ import {
   RiCloseLine,
   RiEdit2Line,
   RiDeleteBin6Line,
+  RiStore2Line,
+  RiMailLine,
+  RiPhoneLine,
+  RiShieldUserLine,
+  RiUserAddFill,
 } from "react-icons/ri";
 import Swal from "sweetalert2";
 
@@ -71,7 +76,7 @@ const SellerRequests = () => {
         updateSellerUserRole({
           id: userId,
           data: { role: selectedRole },
-        })
+        }),
       ).unwrap();
 
       toast.success("Role updated successfully");
@@ -120,182 +125,360 @@ const SellerRequests = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentRequests = requests.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE
+    startIndex + ITEMS_PER_PAGE,
   );
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "bg-amber-50 text-amber-600 border-amber-200";
+      case "APPROVED":
+        return "bg-emerald-50 text-emerald-600 border-emerald-200";
+      case "REJECTED":
+        return "bg-rose-50 text-rose-600 border-rose-200";
+      default:
+        return "bg-gray-50 text-gray-600 border-gray-200";
+    }
+  };
 
   return (
     <>
       <div className="p-4 sm:p-6">
-        <h1 className="text-xl sm:text-2xl font-semibold mb-6">
-          Seller Requests
-        </h1>
+        {/* ===================== COMMAND BAR HEADER ===================== */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+          {/* Left Side: Module Identity */}
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 shrink-0">
+              <RiUserAddFill size={24} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-gray-900 tracking-tight uppercase leading-none">
+                Seller <span className="text-red-500">Requests</span>
+              </h1>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">
+                Onboarding & Partner Verification
+              </p>
+            </div>
+          </div>
 
+          {/* Right Side: Status & Alert Logic */}
+          <div className="flex items-center gap-3">
+            {/* Global Application Stat */}
+            <div className="flex flex-col items-end px-4 border-r border-gray-100 hidden sm:block">
+              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                Total Applications
+              </p>
+              <p className="text-sm font-black text-gray-900">
+                {requests?.length || 0} Records
+              </p>
+            </div>
+
+            {/* Pending Badge */}
+            <div className="bg-amber-50 px-5 py-2.5 rounded-2xl border border-amber-100 flex items-center gap-3 transition-all hover:bg-amber-100 group">
+              <div className="relative">
+                <RiShieldUserLine className="text-amber-500 text-xl group-hover:scale-110 transition-transform" />
+                {requests?.filter((r) => r.status === "PENDING").length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-amber-50 animate-ping" />
+                )}
+              </div>
+              <div>
+                <p className="text-[9px] font-black text-amber-600 uppercase tracking-[0.1em] leading-none">
+                  Awaiting Review
+                </p>
+                <p className="text-lg font-black text-amber-700 mt-0.5 leading-none">
+                  {requests?.filter((r) => r.status === "PENDING").length}{" "}
+                  <span className="text-[10px] font-bold opacity-60 uppercase">
+                    New
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ===================== CONSISTENT ERROR STATE ===================== */}
         {error && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-            {error}
+          <div className="mb-8 flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl animate-in shake duration-500">
+            <RiErrorWarningFill className="text-xl shrink-0" />
+            <p className="text-xs font-black uppercase tracking-wide">
+              {error}
+            </p>
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="hidden sm:table-header-group bg-gradient-to-r from-orange-600 to-red-600 text-white">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium">Shop</th>
-                <th className="px-4 py-3 text-left font-medium">Email</th>
-                <th className="px-4 py-3 text-left font-medium">Phone</th>
-                <th className="px-4 py-3 text-left font-medium">Category</th>
-                <th className="px-4 py-3 text-left font-medium">Status</th>
-                <th className="px-4 py-3 text-center font-medium">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {!loading && currentRequests.length === 0 && (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    No seller requests found
-                  </td>
-                </tr>
-              )}
-
-              {currentRequests.map((req) => (
-                <tr
-                  key={req._id}
-                  className="border-b last:border-b-0 block sm:table-row hover:bg-indigo-50/60 transition"
-                >
-                  {/* SHOP */}
-                  <td
-                    data-label="Shop"
-                    className="px-4 py-3 block sm:table-cell text-right sm:text-left
-              before:content-[attr(data-label)] before:float-left before:font-medium
-              before:text-gray-500 sm:before:hidden"
-                  >
-                    {req.shopName}
-                  </td>
-
-                  {/* EMAIL */}
-                  <td
-                    data-label="Email"
-                    className="px-4 py-3 block sm:table-cell text-right sm:text-left break-all
-              before:content-[attr(data-label)] before:float-left before:font-medium
-              before:text-gray-500 sm:before:hidden"
-                  >
-                    {req.email}
-                  </td>
-
-                  {/* PHONE */}
-                  <td
-                    data-label="Phone"
-                    className="px-4 py-3 block sm:table-cell text-right sm:text-left
-              before:content-[attr(data-label)] before:float-left before:font-medium
-              before:text-gray-500 sm:before:hidden"
-                  >
-                    {req.phone}
-                  </td>
-
-                  {/* CATEGORY */}
-                  <td
-                    data-label="Category"
-                    className="px-4 py-3 block sm:table-cell text-right sm:text-left
-              before:content-[attr(data-label)] before:float-left before:font-medium
-              before:text-gray-500 sm:before:hidden"
-                  >
-                    {req.category?.name ?? "No Category"}
-                  </td>
-
-                  {/* STATUS */}
-                  <td
-                    data-label="Status"
-                    className="px-4 py-3 block sm:table-cell text-right sm:text-left
-              before:content-[attr(data-label)] before:float-left before:font-medium
-              before:text-gray-500 sm:before:hidden"
-                  >
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                        req.status === "PENDING"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : req.status === "APPROVED"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-rose-100 text-rose-700"
-                      }`}
+        {/* ===================== TABLE CONTAINER (DESKTOP) ===================== */}
+        <div className="hidden lg:block bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100">
+                  {[
+                    "Business Detail",
+                    "Contact Info",
+                    "Industry",
+                    "Current Status",
+                    "Moderation Actions",
+                  ].map((header) => (
+                    <th
+                      key={header}
+                      className="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap"
                     >
-                      {req.status}
-                    </span>
-                  </td>
-
-                  {/* ACTION */}
-                  <td
-                    data-label="Action"
-                    className="px-4 py-3 block sm:table-cell text-right sm:text-center
-              before:content-[attr(data-label)] before:float-left before:font-medium
-              before:text-gray-500 sm:before:hidden"
-                  >
-                    {req.status === "PENDING" ? (
-                      <div className="flex justify-end sm:justify-center gap-2">
-                        <button
-                          onClick={() => handleApprove(req._id)}
-                          className="p-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
-                        >
-                          <RiCheckLine />
-                        </button>
-                        <button
-                          onClick={() => handleReject(req._id)}
-                          className="p-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
-                        >
-                          <RiCloseLine />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex justify-end sm:justify-center gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedUser(req);
-                            setSelectedRole(req.user?.role || "USER");
-                            setIsEditOpen(true);
-                          }}
-                          className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white"
-                        >
-                          <RiEdit2Line />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(req._id)}
-                          className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-red-600 hover:text-white"
-                        >
-                          <RiDeleteBin6Line />
-                        </button>
-                      </div>
-                    )}
-                  </td>
+                      {header}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
 
+              <tbody className="divide-y divide-gray-50 font-medium text-sm">
+                {!loading && currentRequests.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="py-20 text-center bg-gray-50/30">
+                      <p className="text-gray-400 font-black uppercase tracking-widest text-sm italic">
+                        No Seller Requests Found
+                      </p>
+                    </td>
+                  </tr>
+                )}
+
+                {currentRequests.map((req) => (
+                  <tr
+                    key={req._id}
+                    className="hover:bg-gray-50/50 transition-all duration-200 group"
+                  >
+                    {/* Shop Details */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500 shrink-0 border border-red-100 shadow-sm">
+                          <RiStore2Line size={24} />
+                        </div>
+                        <div className="max-w-[200px]">
+                          <p className="text-sm font-black text-gray-900 truncate leading-tight uppercase tracking-tight">
+                            {req.shopName}
+                          </p>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">
+                            ID: #{req._id.slice(-8).toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Contact Info */}
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        <p className="text-xs font-bold text-gray-700 flex items-center gap-1.5 hover:text-red-500 transition-colors">
+                          {req.email}
+                        </p>
+                        <p className="text-[10px] font-black text-gray-400 flex items-center gap-1.5 uppercase tracking-tighter">
+                          Tel: {req.phone}
+                        </p>
+                      </div>
+                    </td>
+
+                    {/* Category */}
+                    <td className="px-6 py-4">
+                      <span className="text-[10px] font-black text-red-500 bg-red-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                        {req.category?.name ?? "General"}
+                      </span>
+                    </td>
+
+                    {/* Status Badge */}
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase border tracking-widest
+                      ${
+                        req.status === "PENDING"
+                          ? "bg-amber-50 text-amber-600 border-amber-200"
+                          : req.status === "APPROVED"
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                            : "bg-rose-50 text-rose-600 border-rose-200"
+                      }`}
+                      >
+                        {req.status}
+                      </span>
+                    </td>
+
+                    {/* Row Actions */}
+                    <td className="px-6 py-4">
+                      <div className="flex justify-end gap-2">
+                        {req.status === "PENDING" ? (
+                          <>
+                            <button
+                              onClick={() => handleApprove(req._id)}
+                              title="Approve Seller"
+                              className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm shadow-emerald-100"
+                            >
+                              <RiCheckLine size={20} />
+                            </button>
+                            <button
+                              onClick={() => handleReject(req._id)}
+                              title="Reject Seller"
+                              className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm shadow-rose-100"
+                            >
+                              <RiCloseLine size={20} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => {
+                                setSelectedUser(req);
+                                setSelectedRole(req.user?.role || "USER");
+                                setIsEditOpen(true);
+                              }}
+                              title="Edit Permissions"
+                              className="p-2.5 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-900 hover:text-white transition-all"
+                            >
+                              <RiEdit2Line size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(req._id)}
+                              title="Delete Permanently"
+                              className="p-2.5 bg-gray-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"
+                            >
+                              <RiDeleteBin6Line size={18} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {loading && (
+              <div className="p-12 text-center bg-white">
+                <Loader />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ===================== MOBILE LIST VIEW (REDESIGNED) ===================== */}
+        <div className="lg:hidden space-y-4">
+          {!loading && currentRequests.length === 0 && (
+            <div className="bg-white rounded-[2rem] p-12 text-center border border-dashed border-gray-200">
+              <p className="text-gray-400 font-bold tracking-tight italic">
+                No applications available.
+              </p>
+            </div>
+          )}
+
+          {currentRequests.map((req) => (
+            <div
+              key={req._id}
+              className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm transition-all active:scale-[0.98] hover:shadow-md"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center border border-red-100 shadow-inner">
+                    <RiStore2Line size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900 uppercase leading-none tracking-tight">
+                      {req.shopName}
+                    </h3>
+                    <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-tighter">
+                      {req.category?.name ?? "General Industry"}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase border tracking-widest ${getStatusStyle(req.status)}`}
+                >
+                  {req.status}
+                </span>
+              </div>
+
+              <div className="space-y-2 py-4 border-y border-gray-50">
+                <p className="text-xs font-bold text-gray-600 truncate flex items-center gap-2">
+                  <RiMailLine size={14} className="text-red-500" /> {req.email}
+                </p>
+                <p className="text-xs font-bold text-gray-600 flex items-center gap-2">
+                  <RiPhoneLine size={14} className="text-red-500" /> {req.phone}
+                </p>
+              </div>
+
+              <div className="mt-4 flex justify-end gap-2">
+                {req.status === "PENDING" ? (
+                  <>
+                    <button
+                      onClick={() => handleApprove(req._id)}
+                      className="flex-1 py-3 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100 active:scale-95 transition-all"
+                    >
+                      Approve Request
+                    </button>
+                    <button
+                      onClick={() => handleReject(req._id)}
+                      className="flex-1 py-3 bg-rose-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-rose-100 active:scale-95 transition-all"
+                    >
+                      Reject
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex gap-2 w-full">
+                    <button
+                      onClick={() => {
+                        setSelectedUser(req);
+                        setSelectedRole(req.user?.role || "USER");
+                        setIsEditOpen(true);
+                      }}
+                      className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95"
+                    >
+                      <RiEdit2Line /> Modify Privilege
+                    </button>
+                    <button
+                      onClick={() => handleDelete(req._id)}
+                      className="w-12 h-12 flex items-center justify-center bg-gray-50 text-red-600 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-inner"
+                    >
+                      <RiDeleteBin6Line size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
           {loading && (
-            <div className="p-6 text-center">
+            <div className="py-6 text-center">
               <Loader />
             </div>
           )}
         </div>
 
+        {/* ===================== PAGINATION (REDESIGNED) ===================== */}
         {totalPages > 1 && (
-          <div className="mt-6 flex justify-center gap-2">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-3 py-1 rounded-lg border text-sm transition ${
-                  currentPage === i + 1
-                    ? "bg-red-600 text-white border-red-600"
-                    : "hover:bg-red-50 text-gray-700"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
+          <div className="flex items-center justify-center gap-3 pt-6 animate-in slide-in-from-bottom-2 duration-500">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 disabled:opacity-30 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm"
+            >
+              <RiArrowLeftSLine size={24} />
+            </button>
+
+            <div className="flex items-center gap-1.5 bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`w-10 h-10 rounded-xl font-black text-[11px] tracking-tighter transition-all duration-300
+                  ${
+                    currentPage === i + 1
+                      ? "bg-red-500 text-white shadow-lg shadow-red-200 scale-105"
+                      : "bg-transparent text-gray-500 hover:text-red-500 hover:bg-white"
+                  }`}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </button>
+              ))}
+            </div>
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 disabled:opacity-30 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm"
+            >
+              <RiArrowRightSLine size={24} />
+            </button>
           </div>
         )}
       </div>

@@ -8,7 +8,7 @@ import {
   deleteProduct,
 } from "../../features/product/productSlice";
 import { getAllCategories } from "../../features/category/categorySlice";
-import { RiEdit2Line, RiDeleteBin6Line, RiEyeLine } from "react-icons/ri";
+import { RiEdit2Line, RiDeleteBin6Line, RiEyeLine, RiBox3Fill, RiAddLine } from "react-icons/ri";
 import { FaStar, FaStarHalfAlt, FaRegStar, FaPlus } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import { toast } from "react-hot-toast";
@@ -238,297 +238,275 @@ const MyProducts = () => {
   return (
     <div className="p-4 sm:p-6">
       {/* HEADER */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* TITLE */}
-        <h1 className="text-lg sm:text-2xl font-semibold text-gray-800">
-          My Products
-        </h1>
+    {/* ===================== COMMAND BAR HEADER (SELLER PRODUCTS) ===================== */}
+<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+  {/* Left Side: Module Identity */}
+  <div className="flex items-center gap-4">
+    <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 shrink-0">
+      <RiBox3Fill size={24} />
+    </div>
+    <div>
+      <h1 className="text-2xl font-black text-gray-900 tracking-tight uppercase leading-none">
+        Inventory <span className="text-red-500">Center</span>
+      </h1>
+      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">
+        Manage listings & Stock levels
+      </p>
+    </div>
+  </div>
 
-        {/* RIGHT SIDE */}
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="text-xs sm:text-sm text-gray-500">
-            Active Products:
-            <span className="ml-1 font-semibold text-orange-600">
-              {activeProducts}
-            </span>
-          </p>
+  {/* Right Side: Metrics & Primary Action */}
+  <div className="flex items-center gap-4">
+    {/* Active Inventory Badge */}
+    <div className="hidden sm:flex flex-col items-end px-4 border-r border-gray-100">
+       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Storefront Presence</p>
+       <p className="text-sm font-black text-gray-900">
+         {activeProducts} <span className="text-emerald-500 text-[10px]">Active</span>
+       </p>
+    </div>
 
-          <button
-            onClick={() => setIsCreateOpen(true)}
-            className="
-        flex items-center justify-center
-        px-3 py-3 sm:px-4 
-        rounded-lg bg-red-500 text-white
-        text-xs sm:text-sm
-        hover:bg-red-600
-        w-full sm:w-auto
-      "
-          >
-            <FaPlus className="mr-1 sm:mr-2" />
-            Add Product
-          </button>
-        </div>
-      </div>
+    {/* Primary Action Button */}
+    <button
+      onClick={() => setIsCreateOpen(true)}
+      className="group flex items-center justify-center gap-3 px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-red-500 hover:shadow-red-100 transition-all active:scale-95 w-full sm:w-auto"
+    >
+      <RiAddLine className="text-lg group-hover:rotate-90 transition-transform duration-300" />
+      <span>Add Product</span>
+    </button>
+  </div>
+</div>
 
-      {/* mobile */}
+      {/* ===================== MOBILE VIEW (REDESIGNED) ===================== */}
       <div className="lg:hidden space-y-4">
         {!loading && myProducts.length === 0 && (
-          <p className="text-center text-gray-500 py-10">No products found</p>
+          <div className="bg-white rounded-[2rem] p-12 text-center border border-dashed border-gray-200">
+            <p className="text-gray-400 font-black uppercase tracking-widest text-xs">No Inventory Found</p>
+          </div>
         )}
 
         {myProducts.map((product) => {
           const { price, mrp, discountPercentage } = product.pricing || {};
-
           return (
             <div
               key={product._id}
-              className="bg-white rounded-xl shadow border border-gray-300 p-4"
+              className="bg-white rounded-[2rem] p-5 border border-gray-100 shadow-sm transition-all active:scale-[0.98] hover:shadow-md"
             >
-              <div className="flex gap-4">
-                <img
-                  src={product.image?.[0]}
-                  alt={product.title}
-                  className="w-20 h-20 rounded-lg object-cover shadow border border-gray-300"
-                />
+              <div className="flex gap-5">
+                {/* Product Image with Stock Status */}
+                <div className="relative shrink-0">
+                  <img
+                    src={product.image?.[0]}
+                    alt={product.title}
+                    className="w-20 h-20 rounded-2xl object-contain bg-gray-50 border border-gray-100 p-2 shadow-inner"
+                  />
+                  {product.stock < 10 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-white rounded-full animate-pulse" />
+                  )}
+                </div>
 
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 line-clamp-1">
+                {/* Content Area */}
+                <div className="flex-1 min-w-0">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className={`px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase border tracking-widest
+                      ${product.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-rose-50 text-rose-600 border-rose-200"}`}>
+                      {product.isActive ? "Active" : "Hidden"}
+                    </span>
+                    <span className="text-[10px] font-bold text-gray-300 uppercase italic">
+                      #{product._id.slice(-6).toUpperCase()}
+                    </span>
+                  </div>
+                  
+                  <h3 className="font-bold text-gray-900 truncate leading-tight text-sm">
                     {product.title}
                   </h3>
-
-                  <p className="text-xs text-gray-500 line-clamp-2">
-                    {product.description}
+                  
+                  <p className="text-[10px] font-black text-gray-400 uppercase mt-1">
+                    {product.brand} • {product.category?.name || "General"}
                   </p>
 
-                  <p className="text-xs mt-1">
-                    <span className="font-medium">{product.brand}</span> •{" "}
-                    {product.category?.name || "—"}
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-sm font-black text-gray-900">₹{price}</span>
+                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-1 rounded">-{discountPercentage}%</span>
+                  </div>
                 </div>
               </div>
 
-              {/* PRICE */}
-              <div className="flex items-center gap-3 mt-3">
-                <span className="text-lg font-bold">₹{price}</span>
-                <span className="text-sm text-gray-400 line-through">
-                  ₹{mrp}
-                </span>
-                <span className="text-sm text-green-600 font-semibold">
-                  {discountPercentage}%
-                </span>
-              </div>
-
-              {/* META */}
-              <div className="flex justify-between items-center mt-3">
-                <div className="flex items-center gap-1">
-                  {renderStars(product.ratings?.average)}
-                  <span className="text-xs text-gray-500">
-                    ({product.ratings?.count || 0})
+              {/* Inventory & Actions */}
+              <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter leading-none tracking-widest">Inventory</span>
+                  <span className={`text-xs font-bold mt-1 ${product.stock < 10 ? 'text-rose-500' : 'text-gray-700'}`}>
+                    {product.stock < 10 ? `Low (${product.stock})` : `${product.stock} Units`}
                   </span>
                 </div>
-
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    product.isActive
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
-                  }`}
-                >
-                  {product.isActive ? "Active" : "Inactive"}
-                </span>
-              </div>
-
-              {/* STOCK */}
-              <div className="flex justify-between mt-3 text-xs text-gray-600">
-                <p>
-                  Stock:{" "}
-                  {product.stock < 10 ? (
-                    <span className="text-red-600 font-semibold">
-                      Low ({product.stock})
-                    </span>
-                  ) : (
-                    product.stock
-                  )}
-                </p>
-                <p>{product.delivery?.estimated}</p>
-              </div>
-
-              {/* ACTIONS */}
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  onClick={() => handleViewProduct(product._id)}
-                  className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
-                >
-                  <RiEyeLine />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setSelectedProduct(product);
-                    setExistingImages(product.image || []);
-                    setRemovedImages([]);
-                    setImages([]);
-                    setIsEditOpen(true);
-                  }}
-                  className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
-                >
-                  <RiEdit2Line />
-                </button>
-
-                <button
-                  onClick={() => handleDeleteProduct(product._id)}
-                  className="p-2 rounded-lg bg-gray-200 hover:bg-red-600 hover:text-white"
-                >
-                  <RiDeleteBin6Line />
-                </button>
+                
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleViewProduct(product._id)} 
+                    className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-100"
+                  >
+                    <RiEyeLine size={18}/>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedProduct(product);
+                      setExistingImages(product.image || []);
+                      setRemovedImages([]);
+                      setImages([]);
+                      setIsEditOpen(true);
+                    }} 
+                    className="p-2.5 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm shadow-amber-100"
+                  >
+                    <RiEdit2Line size={18}/>
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteProduct(product._id)} 
+                    className="p-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm shadow-red-100"
+                  >
+                    <RiDeleteBin6Line size={18}/>
+                  </button>
+                </div>
               </div>
             </div>
           );
         })}
 
-        {loading && (
-          <div className="text-center py-6">
-            <Loader />
-          </div>
-        )}
+        {loading && <div className="py-10 text-center"><Loader /></div>}
       </div>
 
-      {/* Desktop */}
-      <div className="hidden lg:block bg-white rounded-2xl shadow border border-gray-300 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-[1800px] w-full text-sm">
-            <thead className="bg-gradient-to-r from-orange-600 to-red-600 text-white">
-              <tr>
+      {/* ===================== DESKTOP VIEW (REDESIGNED) ===================== */}
+      <div className="hidden lg:block bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="min-w-[1800px] w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50/50 border-b border-gray-100">
                 {[
-                  "Image",
-                  "Product",
-                  "Brand",
-                  "Category",
-                  "Price",
-                  "MRP",
-                  "Discount",
-                  "Stock",
-                  "Rating",
-                  "Orders",
-                  "Delivery",
-                  "Active",
-                  "Created",
-                  "Action",
-                ].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left whitespace-nowrap">
-                    {h}
+                  "Visual", "Item Specification", "Brand Identity", "Taxonomy", "Net Price", 
+                  "List Price", "Savings", "Stock Level", "Review Score", "Sold Vol.", 
+                  "Logistics", "Store Visibility", "Created On", "Operations"
+                ].map((header) => (
+                  <th key={header} className="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
+                    {header}
                   </th>
                 ))}
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="divide-y divide-gray-50 font-medium text-sm">
               {!loading && myProducts.length === 0 && (
                 <tr>
-                  <td colSpan="15" className="text-center py-10 text-gray-500">
-                    No products found
+                  <td colSpan="14" className="py-24 text-center bg-gray-50/30">
+                    <p className="text-gray-400 font-black uppercase tracking-[0.3em] text-sm italic">Catalog is Empty</p>
                   </td>
                 </tr>
               )}
 
               {myProducts.map((product) => {
-                const { price, mrp, discountPercentage } =
-                  product.pricing || {};
-
+                const { price, mrp, discountPercentage } = product.pricing || {};
                 return (
-                  <tr
-                    key={product._id}
-                    className="border-b border-gray-300 hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-3">
-                      <img
-                        src={product.image?.[0]}
-                        alt={product.title}
-                        className="w-12 h-12 rounded-lg object-cover border border-gray-300 shadow"
-                      />
-                    </td>
-
-                    <td className="px-4 py-3">
-                      <p className="font-semibold line-clamp-1">
-                        {product.title}
-                      </p>
-                      <p className="text-xs text-gray-500 line-clamp-1">
-                        {product.description}
-                      </p>
-                    </td>
-
-                    <td className="px-4 py-3">{product.brand}</td>
-                    <td className="px-4 py-3">
-                      {product.category?.name || "—"}
-                    </td>
-
-                    <td className="px-4 py-3 font-medium">₹{price}</td>
-                    <td className="px-4 py-3 line-through text-gray-400">
-                      ₹{mrp}
-                    </td>
-                    <td className="px-4 py-3 text-green-600 font-semibold">
-                      {discountPercentage}%
-                    </td>
-                    <td className="px-4 py-3">
-                      {product.stock < 10 ? (
-                        <span className="text-red-600 font-semibold">
-                          Low ({product.stock})
-                        </span>
-                      ) : (
-                        product.stock
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1">
-                        {renderStars(product.ratings?.average)}
+                  <tr key={product._id} className="hover:bg-gray-50/50 transition-all duration-200 group">
+                    {/* Visual */}
+                    <td className="px-6 py-4">
+                      <div className="relative w-14 h-14">
+                        <img
+                          src={product.image?.[0]}
+                          alt={product.title}
+                          className="w-full h-full rounded-2xl object-contain border border-gray-100 bg-white p-1 shadow-sm group-hover:scale-110 transition-transform"
+                        />
                       </div>
                     </td>
-                    <td className="px-4 py-3">{product.ordersCount || 0}</td>
-                    <td className="px-4 py-3 text-xs">
-                      {product.delivery?.estimated}
+
+                    {/* Specification */}
+                    <td className="px-6 py-4">
+                      <div className="max-w-[250px]">
+                        <p className="text-sm font-black text-gray-900 line-clamp-1 group-hover:text-red-500 transition-colors uppercase tracking-tight">
+                          {product.title}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-bold line-clamp-1 mt-1">
+                          {product.description}
+                        </p>
+                      </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          product.isActive === true
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
-                        }`}
-                      >
-                        {product.isActive === true ? "Active" : "Inactive"}
+
+                    {/* Brand */}
+                    <td className="px-6 py-4">
+                      <span className="text-[10px] font-black text-red-500 bg-red-50 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        {product.brand}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs">
-                      {new Date(product.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleViewProduct(product._id)}
-                          className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
-                        >
-                          <RiEyeLine />
-                        </button>
 
-                        <button
+                    {/* Category */}
+                    <td className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">
+                      {product.category?.name || "General"}
+                    </td>
+
+                    {/* Pricing Logic */}
+                    <td className="px-6 py-4 font-black text-gray-900 italic text-sm">₹{price.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-gray-400 line-through text-xs font-bold opacity-60">₹{mrp.toLocaleString()}</td>
+                    <td className="px-6 py-4">
+                      <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+                        {discountPercentage}% OFF
+                      </span>
+                    </td>
+
+                    {/* Inventory */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-2 h-2 rounded-full ${product.stock < 10 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
+                        <span className={`text-xs font-black uppercase ${product.stock < 10 ? 'text-red-600' : 'text-gray-600'}`}>
+                          {product.stock < 10 ? `LOW (${product.stock})` : `${product.stock} In Stock`}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* Quality */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex text-yellow-400 scale-90 origin-left">
+                          {renderStars(product.ratings?.average)}
+                        </div>
+                        <span className="text-[10px] font-black text-gray-300">({product.ratings?.count})</span>
+                      </div>
+                    </td>
+
+                    {/* Performance */}
+                    <td className="px-6 py-4">
+                       <span className="text-xs font-black text-gray-800 border-b-2 border-red-500/10 italic">{product.ordersCount || 0} Orders</span>
+                    </td>
+
+                    {/* Logistics */}
+                    <td className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase leading-tight tracking-tighter">
+                      {product.delivery?.estimated}
+                    </td>
+
+                    {/* Visibility */}
+                    <td className="px-6 py-4">
+                       <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase border tracking-widest
+                        ${product.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-rose-50 text-rose-600 border-rose-200"}`}>
+                        {product.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+
+                    {/* Date */}
+                    <td className="px-6 py-4 text-[10px] font-bold text-gray-400">
+                      {new Date(product.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric'})}
+                    </td>
+
+                    {/* Row Actions */}
+                    <td className="px-6 py-4 sticky right-0 bg-white group-hover:bg-gray-50 transition-colors">
+                      <div className="flex justify-end gap-1.5">
+                        <button onClick={() => handleViewProduct(product._id)} className="p-2 text-blue-600 hover:bg-blue-100 rounded-xl transition-all"><RiEyeLine size={18} /></button>
+                        <button 
                           onClick={() => {
                             setSelectedProduct(product);
                             setExistingImages(product.image || []);
                             setRemovedImages([]);
                             setImages([]);
                             setIsEditOpen(true);
-                          }}
-                          className="p-2 rounded-lg bg-gray-200 hover:bg-gray-700 hover:text-white"
-                        >
-                          <RiEdit2Line />
-                        </button>
-
-                        <button
-                          onClick={() => handleDeleteProduct(product._id)}
-                          className="p-2 rounded-lg bg-gray-200 hover:bg-red-600 hover:text-white"
-                        >
-                          <RiDeleteBin6Line />
-                        </button>
+                          }} 
+                          className="p-2 text-amber-600 hover:bg-amber-100 rounded-xl transition-all"
+                        ><RiEdit2Line size={18} /></button>
+                        <button onClick={() => handleDeleteProduct(product._id)} className="p-2 text-red-600 hover:bg-red-100 rounded-xl transition-all"><RiDeleteBin6Line size={18} /></button>
                       </div>
                     </td>
                   </tr>
@@ -538,11 +516,7 @@ const MyProducts = () => {
           </table>
         </div>
 
-        {loading && (
-          <div className="p-6 text-center">
-            <Loader />
-          </div>
-        )}
+        {loading && <div className="p-16 text-center bg-white"><Loader /></div>}
       </div>
 
       {isCreateOpen && (

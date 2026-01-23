@@ -1,16 +1,17 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { TiTick } from "react-icons/ti";
-import { RiShoppingCartFill } from "react-icons/ri";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../features/auth/authSlice";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
 
+// Icons
+import { RiShieldCheckFill, RiFlashlightFill, RiTruckFill, RiCoupon3Fill } from "react-icons/ri";
+import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+
 const LoginPage = () => {
   const [user, setUser] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -24,11 +25,8 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const res = await dispatch(login(user)).unwrap();
-
-      toast.success("Login successful!");
-
+      toast.success("Welcome back!");
       const role = res?.user?.role;
-
       if (role === "ADMIN") navigate("/admin");
       else if (role === "SELLER") navigate("/seller");
       else if (role === "SUPERADMIN") navigate("/superadmin");
@@ -38,125 +36,137 @@ const LoginPage = () => {
     }
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  if (loading) return <Loader />;
 
   return (
-    <section className="min-h-screen bg-gray-50 flex items-center">
-      <div className="container mx-auto px-5 py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left – Branding / Benefits */}
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 leading-tight flex items-center gap-3">
-              Welcome back <br />
-              Let’s continue shopping
-              {/* <RiShoppingCartFill className="text-red-500 text-4xl" /> */}
-            </h1>
+    <div className="min-h-screen bg-white flex">
+      {/* 1. LEFT SIDE: BRANDING (Hidden on Mobile) */}
+      <div className="hidden lg:flex lg:w-1/2 bg-red-500 relative overflow-hidden items-center justify-center p-12">
+        {/* Background Decorative Circles */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-black/10 rounded-full translate-x-1/4 translate-y-1/4" />
 
-            <p className="mt-4 text-gray-600 text-lg">
-              Login to manage your cart, track orders, and grab exclusive deals
-              before they’re gone.
-            </p>
+        <div className="relative z-10 max-w-lg text-white">
+          <Link to="/" className="flex items-center gap-3 mb-12">
+            <div className="bg-white p-2 rounded-xl">
+               <RiFlashlightFill className="text-red-500 text-3xl" />
+            </div>
+            <span className="text-3xl font-black tracking-tighter uppercase">Cart<span className="text-red-200">App</span></span>
+          </Link>
 
-            <ul className="mt-6 space-y-3 text-gray-700">
-              <li className="flex items-center gap-2">
-                <TiTick className="text-green-500 text-xl" />
-                Saved cart items
-              </li>
-              <li className="flex items-center gap-2">
-                <TiTick className="text-green-500 text-xl" />
-                Order tracking
-              </li>
-              <li className="flex items-center gap-2">
-                <TiTick className="text-green-500 text-xl" />
-                Secure checkout
-              </li>
-              <li className="flex items-center gap-2">
-                <TiTick className="text-green-500 text-xl" />
-                Members-only offers
-              </li>
-            </ul>
+          <h1 className="text-5xl font-black leading-tight mb-6">
+            The Smartest Way <br /> to Shop.
+          </h1>
+          <p className="text-red-100 text-lg mb-10 font-medium">
+            Join our community of over 10k+ shoppers and get access to exclusive daily deals and lightning-fast delivery.
+          </p>
+
+          <div className="grid grid-cols-2 gap-6">
+            <BenefitItem icon={<RiShieldCheckFill />} title="Secure" desc="Verified Payments" />
+            <BenefitItem icon={<RiTruckFill />} title="Fast" desc="Express Shipping" />
+            <BenefitItem icon={<RiCoupon3Fill />} title="Offers" desc="Daily Discounts" />
+            <BenefitItem icon={<RiFlashlightFill />} title="Smart" desc="Easy Tracking" />
+          </div>
+        </div>
+      </div>
+
+      {/* 2. RIGHT SIDE: LOGIN FORM */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gray-50 md:bg-white">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex justify-center mb-8">
+            <Link to="/" className="flex items-center gap-2">
+              <RiFlashlightFill className="text-red-500 text-4xl" />
+              <span className="text-2xl font-black tracking-tighter uppercase">CartApp</span>
+            </Link>
           </div>
 
-          {/* Right – Login Card */}
-          <form onSubmit={handleSubmit}>
-            <div className="bg-white shadow-xl rounded-xl p-8 max-w-md w-full mx-auto">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-1">
-                Login
-              </h2>
-              <p className="text-sm text-gray-500 mb-6">Access your account</p>
+          <div className="text-center md:text-left mb-10">
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight">LOGIN</h2>
+            <p className="text-gray-500 font-medium mt-2">Enter your credentials to access your account</p>
+          </div>
 
-              {/* Email */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Email Address
-                </label>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Field */}
+            <div>
+              <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Email Address</label>
+              <div className="relative group">
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                 <input
                   type="email"
                   name="email"
+                  required
                   onChange={handleChange}
-                  placeholder="abc@example.com"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  placeholder="Enter you email"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 outline-none transition-all focus:border-red-500 focus:ring-4 focus:ring-red-500/10 font-medium"
                 />
               </div>
+            </div>
 
-              {/* Password */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Password
-                </label>
+            {/* Password Field */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Password</label>
+                <Link to="/forgot-password" size="sm" className="text-xs font-bold text-red-500 hover:underline">Forgot?</Link>
+              </div>
+              <div className="relative group">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
+                  required
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  className="w-full pl-12 pr-12 py-4 rounded-2xl border border-gray-200 outline-none transition-all focus:border-red-500 focus:ring-4 focus:ring-red-500/10 font-medium"
                 />
-              </div>
-
-              {/* Remember + Forgot */}
-              <div className="flex items-center justify-between mb-6">
-                <label className="flex items-center text-sm text-gray-600">
-                  <input type="checkbox" className="mr-2 accent-red-500" />
-                  Remember me
-                </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-red-500 hover:underline"
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  Forgot password?
-                </Link>
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
               </div>
-
-              {/* CTA */}
-              <button className="w-full bg-red-500 text-white py-2.5 rounded-lg font-semibold hover:bg-red-600 transition">
-                {loading ? "Logging in..." : "Login"}
-              </button>
-
-              {/* Divider */}
-              <div className="flex items-center my-6">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="px-3 text-sm text-gray-400">OR</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              {/* Signup Link */}
-              <p className="text-sm text-center text-gray-600">
-                New here?{" "}
-                <Link
-                  to="/signup"
-                  className="text-red-500 font-medium hover:underline"
-                >
-                  Create an account
-                </Link>
-              </p>
             </div>
+
+            {/* Remember Me */}
+            <label className="flex items-center gap-3 cursor-pointer group w-fit">
+              <input type="checkbox" className="w-5 h-5 rounded-md border-gray-300 text-red-500 focus:ring-red-500 accent-red-500" />
+              <span className="text-sm font-bold text-gray-600 group-hover:text-gray-900 transition-colors">Keep me logged in</span>
+            </label>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-red-500 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-red-200 hover:bg-red-600 hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-50"
+            >
+              {loading ? "Verifying..." : "Sign In"}
+            </button>
           </form>
+
+          {/* Bottom Link */}
+          <div className="mt-10 text-center">
+            <p className="text-gray-500 font-medium">
+              Don't have an account?{" "}
+              <Link to="/signup" className="text-red-500 font-black hover:underline ml-1 uppercase text-sm tracking-tight">Create Account</Link>
+            </p>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
+
+// Helper Component
+const BenefitItem = ({ icon, title, desc }) => (
+  <div className="flex items-center gap-3">
+    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-xl shrink-0">{icon}</div>
+    <div>
+      <h4 className="font-bold text-sm leading-none">{title}</h4>
+      <p className="text-[10px] text-red-100 uppercase font-bold mt-1 tracking-wider">{desc}</p>
+    </div>
+  </div>
+);
 
 export default LoginPage;

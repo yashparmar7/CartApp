@@ -1,151 +1,225 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
+  RiDashboardFill,
   RiDashboardLine,
+  RiUser3Fill,
   RiUser3Line,
+  RiStore2Fill,
   RiStore2Line,
+  RiShoppingBag3Fill,
   RiShoppingBag3Line,
+  RiBox3Fill,
   RiBox3Line,
+  RiMoneyRupeeCircleFill,
   RiMoneyRupeeCircleLine,
 } from "react-icons/ri";
 import { TbCategoryPlus } from "react-icons/tb";
 
-/* ===================== LINK ===================== */
-const SidebarLink = ({ to, Icon, label, collapsed, onClick }) => {
+/* ===================== SIDEBAR LINK ===================== */
+const SidebarLink = ({ to, Icon, ActiveIcon, label, collapsed, onClick }) => {
   const location = useLocation();
   const isActive =
-    location.pathname === to || location.pathname.startsWith(to + "/");
+    location.pathname === to ||
+    location.pathname.startsWith(to + "/");
 
   return (
     <Link
       to={to}
       onClick={onClick}
-      aria-current={isActive ? "page" : undefined}
-      className={`group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
-        transition-all duration-200 ease-out
+      className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold
+        transition-all duration-300 mx-2
         ${
           isActive
-            ? "bg-red-50 text-red-600"
-            : "text-gray-700 hover:bg-gray-100"
+            ? "bg-red-50 text-red-600 shadow-sm shadow-red-100"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
         }
-        ${collapsed ? "justify-center px-2" : ""}
+        ${collapsed ? "justify-center px-0" : ""}
       `}
     >
-      <Icon
-        className={`text-lg min-w-[20px] transition-transform duration-200
-          ${collapsed ? "scale-110" : "group-hover:scale-110"}
-        `}
-      />
+      {/* Active Indicator */}
+      {isActive && (
+        <div className="absolute left-[-8px] w-1.5 h-6 bg-red-500 rounded-r-full" />
+      )}
 
+      {/* Icon */}
+      <div className="flex items-center justify-center min-w-[24px]">
+        {isActive ? (
+          <ActiveIcon className="text-xl text-red-500" />
+        ) : (
+          <Icon className="text-xl text-gray-400 group-hover:text-red-500 transition-colors" />
+        )}
+      </div>
+
+      {/* Label */}
       {!collapsed && <span className="truncate">{label}</span>}
 
-      {/* TOOLTIP (FIXED – NO OVERFLOW) */}
+      {/* Tooltip when collapsed */}
       {collapsed && (
-        <span
-          className="
-      pointer-events-none fixed
-      left-[80px] top-[var(--tooltip-y)]
-      hidden md:block opacity-0 group-hover:opacity-100
-      bg-gray-900 text-white text-xs rounded px-2 py-1
-      whitespace-nowrap shadow-lg
-      transition-opacity z-[9999]
-    "
-        >
-          {label}
-        </span>
+        <div className="fixed left-20 hidden md:group-hover:flex items-center z-[9999] animate-in fade-in slide-in-from-left-2">
+          <div className="bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-md px-3 py-1.5 shadow-xl whitespace-nowrap">
+            {label}
+          </div>
+          <div className="w-2 h-2 bg-gray-900 rotate-45 -ml-1" />
+        </div>
       )}
     </Link>
   );
 };
 
-/* ===================== SECTION ===================== */
+/* ===================== SIDEBAR SECTION ===================== */
 const SidebarSection = ({ title, collapsed, children }) => {
-  if (collapsed) return <div className="space-y-1">{children}</div>;
-
   return (
-    <div className="space-y-1">
-      <p className="px-3 pt-3 pb-1 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
-        {title}
-      </p>
-      {children}
+    <div className="mb-6">
+      {!collapsed && (
+        <p className="px-6 mb-3 text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase">
+          {title}
+        </p>
+      )}
+      <div className="space-y-1.5">{children}</div>
     </div>
   );
 };
 
-/* ================= SUPER ADMIN ================= */
-export const SuperAdminSidebar = (
-  <>
-    <SidebarSection title="Analytics">
-      <SidebarLink to="/superadmin" Icon={RiDashboardLine} label="Overview" />
-    </SidebarSection>
+/* ================= SUPER ADMIN SIDEBAR ================= */
+export const SuperAdminSidebar = ({ collapsed, onLinkClick }) => {
+  return (
+    <>
+      <SidebarSection title="Insights" collapsed={collapsed}>
+        <SidebarLink
+          to="/superadmin"
+          Icon={RiDashboardLine}
+          ActiveIcon={RiDashboardFill}
+          label="Overview"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+      </SidebarSection>
 
-    <SidebarSection title="Manage">
-      <SidebarLink to="/superadmin/users" Icon={RiUser3Line} label="Users" />
-      <SidebarLink
-        to="/superadmin/sellers"
-        Icon={RiStore2Line}
-        label="Sellers"
-      />
-      <SidebarLink
-        to="/superadmin/orders"
-        Icon={RiShoppingBag3Line}
-        label="Orders"
-      />
-    </SidebarSection>
-  </>
-);
+      <SidebarSection title="Control Center" collapsed={collapsed}>
+        <SidebarLink
+          to="/superadmin/users"
+          Icon={RiUser3Line}
+          ActiveIcon={RiUser3Fill}
+          label="User Directory"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+        <SidebarLink
+          to="/superadmin/sellers"
+          Icon={RiStore2Line}
+          ActiveIcon={RiStore2Fill}
+          label="Sellers List"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+        <SidebarLink
+          to="/superadmin/orders"
+          Icon={RiShoppingBag3Line}
+          ActiveIcon={RiShoppingBag3Fill}
+          label="Global Orders"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+      </SidebarSection>
+    </>
+  );
+};
 
-/* ================= ADMIN ================= */
-export const AdminSidebar = (
-  <>
-    <SidebarSection title="Analytics">
-      <SidebarLink to="/admin" Icon={RiDashboardLine} label="Dashboard" />
-    </SidebarSection>
+/* ================= ADMIN SIDEBAR ================= */
+export const AdminSidebar = ({ collapsed, onLinkClick }) => {
+  return (
+    <>
+      <SidebarSection title="Analytics" collapsed={collapsed}>
+        <SidebarLink
+          to="/admin"
+          Icon={RiDashboardLine}
+          ActiveIcon={RiDashboardFill}
+          label="Dashboard"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+      </SidebarSection>
 
-    <SidebarSection title="Manage">
-      <SidebarLink
-        to="/admin/getSellerRequests"
-        Icon={RiUser3Line}
-        label="Seller Requests"
-      />
-      <SidebarLink to="/admin/products" Icon={RiBox3Line} label="Products" />
-      <SidebarLink
-        to="/admin/orders"
-        Icon={RiShoppingBag3Line}
-        label="Orders"
-      />
-      <SidebarLink
-        to="/admin/categories"
-        Icon={TbCategoryPlus}
-        label="Categories"
-      />
-    </SidebarSection>
-  </>
-);
+      <SidebarSection title="Operations" collapsed={collapsed}>
+        <SidebarLink
+          to="/admin/getSellerRequests"
+          Icon={RiUser3Line}
+          ActiveIcon={RiUser3Fill}
+          label="Seller Requests"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+        <SidebarLink
+          to="/admin/products"
+          Icon={RiBox3Line}
+          ActiveIcon={RiBox3Fill}
+          label="Master Catalogs"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+        <SidebarLink
+          to="/admin/orders"
+          Icon={RiShoppingBag3Line}
+          ActiveIcon={RiShoppingBag3Fill}
+          label="Customer Orders"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+        <SidebarLink
+          to="/admin/categories"
+          Icon={TbCategoryPlus}
+          ActiveIcon={TbCategoryPlus}
+          label="Category Manager"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+      </SidebarSection>
+    </>
+  );
+};
 
-/* ================= SELLER ================= */
-export const SellerSidebar = (
-  <>
-    <SidebarSection title="Analytics">
-      <SidebarLink to="/seller" Icon={RiDashboardLine} label="Dashboard" />
-      <SidebarLink
-        to="/seller/earnings"
-        Icon={RiMoneyRupeeCircleLine}
-        label="Earnings"
-      />
-    </SidebarSection>
+/* ================= SELLER SIDEBAR ================= */
+export const SellerSidebar = ({ collapsed, onLinkClick }) => {
+  return (
+    <>
+      <SidebarSection title="My Store" collapsed={collapsed}>
+        <SidebarLink
+          to="/seller"
+          Icon={RiDashboardLine}
+          ActiveIcon={RiDashboardFill}
+          label="Store Stats"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+        <SidebarLink
+          to="/seller/earnings"
+          Icon={RiMoneyRupeeCircleLine}
+          ActiveIcon={RiMoneyRupeeCircleFill}
+          label="Revenue"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+      </SidebarSection>
 
-    <SidebarSection title="Manage">
-      <SidebarLink
-        to="/seller/products"
-        Icon={RiBox3Line}
-        label="My Products"
-      />
-      <SidebarLink
-        to="/seller/orders"
-        Icon={RiShoppingBag3Line}
-        label="My Orders"
-      />
-    </SidebarSection>
-  </>
-);
+      <SidebarSection title="Inventory" collapsed={collapsed}>
+        <SidebarLink
+          to="/seller/products"
+          Icon={RiBox3Line}
+          ActiveIcon={RiBox3Fill}
+          label="My Products"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+        <SidebarLink
+          to="/seller/orders"
+          Icon={RiShoppingBag3Line}
+          ActiveIcon={RiShoppingBag3Fill}
+          label="My Orders"
+          collapsed={collapsed}
+          onClick={onLinkClick}
+        />
+      </SidebarSection>
+    </>
+  );
+};
