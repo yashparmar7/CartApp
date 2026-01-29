@@ -9,12 +9,15 @@ import { selectIsAuthenticated } from "../features/auth/authSlice";
 import Loader from "./Loader";
 import { toast } from "react-hot-toast";
 
-const Card = () => {
+const Card = ({ products: propProducts }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { products, loading } = useSelector((state) => state.product);
+  const { products: reduxProducts, loading } = useSelector((state) => state.product);
   const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  // Use prop products if provided, otherwise use redux products
+  const products = propProducts || reduxProducts;
 
   const handleAddToCart = (e, id) => {
     e.stopPropagation();

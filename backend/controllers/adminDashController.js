@@ -85,9 +85,22 @@ const getAllProductsAdmin = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate("category", "name");
 
+    // Calculate dynamic order count for each product
+    const productsWithOrderCount = await Promise.all(
+      products.map(async (product) => {
+        const orderCount = await Order.countDocuments({
+          "items.product": product._id,
+        });
+        return {
+          ...product.toObject(),
+          dynamicOrderCount: orderCount,
+        };
+      })
+    );
+
     res.status(200).json({
       success: true,
-      products,
+      products: productsWithOrderCount,
     });
   } catch (err) {
     res.status(500).json({

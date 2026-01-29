@@ -122,10 +122,12 @@ const ProductDetailPage = () => {
                 {/* Rating & Stock */}
                 <div className="flex items-center gap-4 mt-3">
                   <div className="flex items-center gap-1.5 bg-green-600 text-white px-2.5 py-1 rounded-md text-sm font-bold">
-                    {singleProduct.ratings?.average || "4.2"} <FaStar className="text-[10px]" />
+                    {singleProduct.ratings?.average || 0} <FaStar className="text-[10px]" />
                   </div>
-                  <span className="text-sm text-gray-500 font-medium">{singleProduct.ratings?.count || "1,240"} Ratings & Reviews</span>
-                  <span className="text-sm text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded">In Stock</span>
+                  <span className="text-sm text-gray-500 font-medium">{singleProduct.ratings?.count || 0} Ratings & Reviews</span>
+                  <span className={`text-sm font-bold px-2 py-0.5 rounded ${singleProduct.stock > 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>
+                    {singleProduct.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                  </span>
                 </div>
               </div>
 
@@ -136,19 +138,24 @@ const ProductDetailPage = () => {
                   <span className="text-lg text-gray-400 line-through">₹{mrp?.toLocaleString()}</span>
                   <span className="text-red-500 font-bold text-lg">{discountPercentage}% OFF</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">Free delivery available on this item</p>
+                <p className="text-sm text-gray-500 mt-1">{singleProduct.delivery?.cost === "Free" ? "Free delivery available on this item" : `Delivery charges: ₹${singleProduct.delivery?.cost}`}</p>
               </div>
 
               {/* Offers Section */}
               <div className="mt-6">
                 <h3 className="text-sm font-bold uppercase text-gray-400 tracking-wider mb-3">Available Offers</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {[1, 2].map((_, i) => (
-                    <div key={i} className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white">
+                  {singleProduct.offers?.length > 0 ? singleProduct.offers.map((offer, index) => (
+                    <div key={index} className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white">
                       <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />
-                      <p className="text-xs text-gray-700"><b>Bank Offer</b> 10% off on SBI Credit Card, up to ₹1,500. <span className="text-red-500 font-bold">T&C</span></p>
+                      <p className="text-xs text-gray-700">{offer}</p>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white">
+                      <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />
+                      <p className="text-xs text-gray-700">No offers available at the moment.</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -160,7 +167,7 @@ const ProductDetailPage = () => {
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <RiTruckLine className="text-red-500 mb-1" size={20} />
-                  <span className="text-[10px] font-bold text-gray-600 uppercase">Free Delivery</span>
+                  <span className="text-[10px] font-bold text-gray-600 uppercase">{singleProduct.delivery?.estimated || "3-5 Days"} Delivery</span>
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <RiShieldCheckLine className="text-red-500 mb-1" size={20} />

@@ -439,7 +439,7 @@ const Products = () => {
                     {/* Performance */}
                     <td className="px-6 py-4">
                       <span className="text-xs font-black text-gray-900 border-b-2 border-red-500/20">
-                        {product.ordersCount || 0} Orders
+                        {product.dynamicOrderCount || 0} Orders
                       </span>
                     </td>
 

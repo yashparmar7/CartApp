@@ -23,6 +23,15 @@ const createOrder = async (req, res) => {
         .json({ message: "Cart contains unavailable products" });
     }
 
+    // Check stock availability for all products
+    for (const item of validProducts) {
+      if (item.quantity > item.product.stock) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${item.product.title}. Only ${item.product.stock} units available.`
+        });
+      }
+    }
+
     const orderItems = validProducts.map((item) => ({
       product: item.product._id,
       title: item.product.title,
@@ -46,6 +55,7 @@ const createOrder = async (req, res) => {
       paidAt: payment.method === "cod" ? null : new Date(),
     });
 
+    // Decrement stock for each product
     for (const item of orderItems) {
       await Product.findByIdAndUpdate(item.product, {
         $inc: { stock: -item.quantity },
@@ -103,6 +113,13 @@ const cancelOrder = async (req, res) => {
     }
 
     order.orderStatus = "cancelled";
+
+    // Increment stock back for each product in the cancelled order
+    for (const item of order.items) {
+      await Product.findByIdAndUpdate(item.product, {
+        $inc: { stock: item.quantity },
+      });
+    }
 
     // 💸 Refund placeholder (important for paid orders)
     if (order.isPaid) {

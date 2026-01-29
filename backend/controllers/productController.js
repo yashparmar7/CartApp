@@ -85,7 +85,7 @@ const searchProducts = async (req, res) => {
 
     if (category && category !== "") {
       const categoryDoc = await Category.findOne({
-        name: new RegExp(`^${category}$`, "i"),
+        name: new RegExp(`^${category.trim()}$`, "i"),
       });
       if (categoryDoc) {
         filter.category = categoryDoc._id;
