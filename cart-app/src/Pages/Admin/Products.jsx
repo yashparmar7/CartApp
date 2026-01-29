@@ -12,6 +12,8 @@ import {
   RiEyeLine,
   RiErrorWarningFill,
   RiBox3Fill,
+  RiCloseLine,
+  RiMoneyRupeeCircleFill,
 } from "react-icons/ri";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import Loader from "../../components/Loader";
@@ -29,6 +31,25 @@ const InfoBox = ({ label, value }) => (
   <div className="bg-gray-50 rounded-xl p-3">
     <p className="text-xs text-gray-500">{label}</p>
     <p className="font-medium text-gray-800">{value}</p>
+  </div>
+);
+
+const StatTile = ({ label, value }) => (
+  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center hover:shadow-md transition-all">
+    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+      {label}
+    </p>
+    <p className="mt-1 text-lg font-black text-gray-900 tracking-tight">
+      {value ?? "—"}
+    </p>
+  </div>
+);
+const DetailBox = ({ label, value }) => (
+  <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+      {label}
+    </p>
+    <p className="mt-1 text-sm font-bold text-gray-800">{value ?? "—"}</p>
   </div>
 );
 
@@ -517,75 +538,77 @@ const Products = () => {
       </div>
 
       {isEditOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-2xl animate-[scaleIn_0.2s_ease-out]">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-300">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-                Moderate Product
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Review and update product status
-              </p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-md px-4 transition-all duration-300">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl animate-in zoom-in duration-300 border border-white/20 overflow-hidden">
+            {/* HEADER: Branded & Authoritative */}
+            <div className="bg-red-500 p-8 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-1/2 -translate-y-1/2" />
+              <div className="relative z-10">
+                <h2 className="text-2xl font-black uppercase tracking-tight leading-none">
+                  Moderate <span className="text-red-100">Product</span>
+                </h2>
+                <p className="text-red-100 text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-80">
+                  Compliance & Quality Control
+                </p>
+              </div>
             </div>
 
-            {/* Body */}
-            <div className="px-6 py-5 space-y-4">
-              {/* Product Title */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Product
-                </label>
-                <input
-                  disabled
-                  value={selectedProduct.title}
-                  className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
-                />
+            {/* BODY: Structured Premium Inputs */}
+            <div className="p-8 space-y-6">
+              {/* Read-Only Identity Card */}
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center border border-gray-200 shadow-sm overflow-hidden shrink-0">
+                  <img
+                    src={selectedProduct.image?.[0]}
+                    className="w-full h-full object-contain"
+                    alt=""
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                    Selected Item
+                  </p>
+                  <p className="text-sm font-bold text-gray-900 truncate mt-1">
+                    {selectedProduct.title}
+                  </p>
+                  <p className="text-[10px] font-bold text-red-500 uppercase tracking-tighter mt-0.5">
+                    By {selectedProduct.seller?.userName || "Unknown Vendor"}
+                  </p>
+                </div>
               </div>
 
-              {/* Seller */}
+              {/* Status Selection */}
               <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Seller
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">
+                  Update Moderation Status
                 </label>
-                <input
-                  disabled
-                  value={selectedProduct.seller?.userName || "—"}
-                  className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
-                />
+                <div className="relative group">
+                  <select
+                    value={selectedProduct.status}
+                    onChange={(e) =>
+                      setSelectedProduct({
+                        ...selectedProduct,
+                        status: e.target.value,
+                      })
+                    }
+                    className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-gray-50 font-bold text-sm text-gray-800 outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="PENDING">Pending Review</option>
+                    <option value="APPROVED">Approve Listing</option>
+                    <option value="REJECTED">Reject Submission</option>
+                    <option value="BLOCKED">Block Product</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Status */}
+              {/* Admin Feedback */}
               <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Status
-                </label>
-                <select
-                  value={selectedProduct.status}
-                  onChange={(e) =>
-                    setSelectedProduct({
-                      ...selectedProduct,
-                      status: e.target.value,
-                    })
-                  }
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="PENDING">Pending</option>
-                  <option value="APPROVED">Approved</option>
-                  <option value="REJECTED">Rejected</option>
-                  <option value="BLOCKED">Blocked</option>
-                </select>
-              </div>
-
-              {/* Admin Note */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Admin Note
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">
+                  Admin Note (Visible to Seller)
                 </label>
                 <textarea
                   rows="3"
-                  placeholder="Reason for rejection / block"
+                  placeholder="Explain the reason for rejection or block..."
                   value={selectedProduct.adminNote || ""}
                   onChange={(e) =>
                     setSelectedProduct({
@@ -593,98 +616,97 @@ const Products = () => {
                       adminNote: e.target.value,
                     })
                   }
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-gray-50 font-medium text-sm text-gray-700 outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 resize-none transition-all placeholder:text-gray-400"
                 />
               </div>
-            </div>
 
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-300 flex flex-col sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={() => setIsEditOpen(false)}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg border text-sm text-gray-700 hover:bg-gray-100 transition"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={() => handleUpdateProduct(selectedProduct)}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600 transition"
-              >
-                Save Changes
-              </button>
+              {/* ACTIONS: Large & Tactile */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsEditOpen(false)}
+                  className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all active:scale-95"
+                >
+                  Discard
+                </button>
+                <button
+                  onClick={() => handleUpdateProduct(selectedProduct)}
+                  className="flex-1 py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-200 hover:bg-red-600 transition-all active:scale-95"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {isViewOpen && singleProduct && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          {/* MODAL */}
-          <div
-            className="
-        w-full max-w-5xl
-        bg-white rounded-2xl shadow-2xl
-        max-h-[90vh] flex flex-col overflow-hidden
-      "
-          >
-            {/* HEADER */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-                Product Details
-              </h2>
+        <div className="fixed inset-0 z-[100] bg-gray-900/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 transition-all duration-500">
+          {/* MODAL CONTAINER */}
+          <div className="w-full max-w-6xl bg-white rounded-[3rem] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden border border-white/20 animate-in slide-in-from-bottom-4 duration-500">
+            {/* HEADER: Branded & Fixed */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-50 bg-white sticky top-0 z-20">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200">
+                  <RiEyeLine size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight leading-none">
+                    Product <span className="text-red-500">Inspector</span>
+                  </h2>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1.5 italic opacity-70">
+                    System ID: #{singleProduct._id.slice(-12).toUpperCase()}
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={() => setIsViewOpen(false)}
-                className="text-gray-400 hover:text-red-500 text-xl"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-50 text-gray-400 hover:text-red-500 transition-all hover:bg-red-50 group"
               >
-                ✕
+                <RiCloseLine
+                  size={28}
+                  className="group-hover:rotate-90 transition-transform duration-300"
+                />
               </button>
             </div>
 
-            {/* BODY */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* IMAGE (SINGLE – HERO STYLE) */}
-                {/* IMAGES */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Product Images
+            {/* BODY: Scrollable content */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar bg-[#F9FAFB]/50">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                {/* LEFT: VISUAL ASSETS */}
+                <div className="space-y-6 sticky lg:top-0">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">
+                    Visual Assets
                   </h3>
-
-                  {/* MAIN IMAGE */}
-                  <div className="w-full aspect-square rounded-xl border bg-white overflow-hidden flex items-center justify-center">
+                  <div className="w-full aspect-square rounded-[2.5rem] border border-gray-100 bg-white shadow-sm overflow-hidden flex items-center justify-center p-12 group relative">
                     {activeImage ? (
                       <img
                         src={activeImage}
                         alt={singleProduct.title}
-                        className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105"
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 select-none"
                         draggable={false}
                       />
                     ) : (
-                      <div className="text-gray-400 text-sm">No image</div>
+                      <div className="text-gray-300 font-black uppercase text-xs tracking-widest italic">
+                        Graphic Missing
+                      </div>
                     )}
                   </div>
 
-                  {/* THUMBNAILS */}
+                  {/* THUMBNAILS GALLERY */}
                   {singleProduct.image?.length > 1 && (
-                    <div className="flex gap-3 flex-wrap">
+                    <div className="flex gap-4 flex-wrap justify-center bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm">
                       {singleProduct.image.map((img, index) => (
                         <button
                           key={index}
                           onClick={() => setActiveImage(img)}
-                          className={`w-16 h-16 rounded-lg border overflow-hidden transition
-            ${
-              activeImage === img
-                ? "border-red-500 ring-2 ring-red-200"
-                : "border-gray-200 hover:border-gray-400"
-            }`}
+                          className={`w-20 h-20 rounded-2xl border-2 overflow-hidden transition-all duration-300 shrink-0 
+                      ${activeImage === img ? "border-red-500 scale-95 shadow-md shadow-red-100" : "border-gray-100 opacity-60 hover:opacity-100 hover:scale-105"}`}
                         >
                           <img
                             src={img}
-                            alt={`thumb-${index}`}
-                            className="w-full h-full object-contain p-1"
-                            draggable={false}
+                            className="w-full h-full object-cover"
+                            alt={`view-${index}`}
                           />
                         </button>
                       ))}
@@ -692,115 +714,142 @@ const Products = () => {
                   )}
                 </div>
 
-                {/* DETAILS */}
-                <div className="space-y-5">
-                  {/* TITLE + DESC */}
+                {/* RIGHT: DATA & ANALYTICS */}
+                <div className="space-y-8">
+                  {/* 1. Identity & Narrative */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800">
+                    <div className="flex items-center gap-3 mb-5">
+                      <span
+                        className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border 
+                  ${
+                    singleProduct.status === "APPROVED"
+                      ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                      : singleProduct.status === "PENDING"
+                        ? "bg-amber-50 text-amber-600 border-amber-200"
+                        : "bg-rose-50 text-rose-600 border-rose-200"
+                  }`}
+                      >
+                        {singleProduct.status}
+                      </span>
+                      <span className="px-3 py-1 rounded-full bg-gray-900 text-white text-[9px] font-black uppercase tracking-tighter">
+                        {singleProduct.isActive ? "Live" : "Hidden"}
+                      </span>
+                    </div>
+                    <h3 className="text-4xl font-black text-gray-900 leading-none tracking-tighter uppercase italic">
                       {singleProduct.title}
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                      {singleProduct.description}
+                    <p className="text-gray-500 font-medium mt-6 text-sm leading-relaxed bg-white p-6 rounded-3xl border border-gray-100 italic shadow-sm border-l-4 border-l-red-500">
+                      "{singleProduct.description}"
                     </p>
                   </div>
 
-                  {/* BRAND / CATEGORY */}
-                  <div className="flex flex-wrap gap-4 text-sm">
-                    <p>
-                      <b>Brand:</b> {singleProduct.brand}
-                    </p>
-                    <p>
-                      <b>Category:</b> {singleProduct.category?.name}
-                    </p>
+                  {/* 2. Classification Info */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <DetailBox
+                      label="Assigned Brand"
+                      value={singleProduct.brand || "Private Label"}
+                    />
+                    <DetailBox
+                      label="Master Category"
+                      value={singleProduct.category?.name || "Uncategorized"}
+                    />
                   </div>
 
-                  {/* PRICE */}
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Pricing
+                  {/* 3. Pricing Logic Card */}
+                  <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-gray-200">
+                    <RiMoneyRupeeCircleFill className="absolute -right-4 -bottom-4 text-white/5 text-[10rem] pointer-events-none" />
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">
+                      Market Valuation
                     </p>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="text-2xl font-bold text-gray-800">
-                        ₹{singleProduct.pricing?.price}
+                    <div className="flex items-baseline gap-4 relative z-10">
+                      <span className="text-4xl font-black tracking-tighter italic">
+                        ₹{singleProduct.pricing?.price.toLocaleString()}
                       </span>
-                      <span className="line-through text-gray-400">
-                        ₹{singleProduct.pricing?.mrp}
+                      <span className="text-gray-500 line-through font-bold text-sm">
+                        ₹{singleProduct.pricing?.mrp.toLocaleString()}
                       </span>
-                      <span className="text-green-600 font-semibold">
+                      <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-tighter shadow-lg shadow-red-500/20">
                         {singleProduct.pricing?.discountPercentage}% OFF
                       </span>
                     </div>
                   </div>
 
-                  {/* DELIVERY */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                    <InfoBox
-                      label="Delivery"
-                      value={singleProduct.delivery?.estimated}
+                  {/* 4. Logistics & Supply Chain */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <StatTile
+                      label="Lead Time"
+                      value={singleProduct.delivery?.estimated || "—"}
                     />
-                    <InfoBox
-                      label="Cost"
-                      value={singleProduct.delivery?.cost}
+                    <StatTile
+                      label="Ship Fee"
+                      value={
+                        singleProduct.delivery?.cost === 0
+                          ? "Free"
+                          : `₹${singleProduct.delivery?.cost}`
+                      }
                     />
-                    <InfoBox
-                      label="COD"
+                    <StatTile
+                      label="COD Support"
                       value={
                         singleProduct.delivery?.codAvailable
-                          ? "Available"
-                          : "No"
+                          ? "Active"
+                          : "Disabled"
                       }
                     />
                   </div>
 
-                  {/* STATS */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                    <Stat label="Stock" value={singleProduct.stock} />
-                    <Stat label="Orders" value={singleProduct.ordersCount} />
-                    <Stat label="Sold" value={singleProduct.soldCount} />
-                    <Stat
-                      label="Active"
-                      value={singleProduct.isActive ? "Yes" : "No"}
+                  {/* 5. Inventory & Sales Performance */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <StatTile
+                      label="Stock On Hand"
+                      value={singleProduct.stock}
+                    />
+                    <StatTile
+                      label="Lifetime Orders"
+                      value={singleProduct.ordersCount || 0}
+                    />
+                    <StatTile
+                      label="Total Units Sold"
+                      value={singleProduct.soldCount || 0}
+                    />
+                    <StatTile
+                      label="Review Count"
+                      value={singleProduct.ratings?.count || 0}
                     />
                   </div>
 
-                  {/* RATING */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex">
-                      {renderStars(singleProduct.ratings?.average)}
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      ({singleProduct.ratings?.count} reviews)
-                    </span>
-                  </div>
-
-                  {/* STATUS */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <span
-                      className={`px-4 py-1 rounded-full text-xs font-semibold w-fit ${
-                        singleProduct.status === "APPROVED"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : singleProduct.status === "PENDING"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-rose-100 text-rose-700"
-                      }`}
-                    >
-                      {singleProduct.status}
-                    </span>
-
-                    {singleProduct.adminNote && (
-                      <p className="text-xs text-gray-500">
-                        <b>Admin Note:</b> {singleProduct.adminNote}
+                  {/* 6. Ratings & Moderation Logs */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex text-yellow-400 text-xl">
+                        {renderStars(singleProduct.ratings?.average)}
+                      </div>
+                      <p className="text-sm font-black text-gray-900 uppercase tracking-tighter italic">
+                        ({singleProduct.ratings?.average?.toFixed(1)} / 5.0)
                       </p>
+                    </div>
+                    {singleProduct.adminNote && (
+                      <div className="bg-red-50 px-4 py-2 rounded-xl border border-red-100">
+                        <p className="text-[9px] font-black text-red-400 uppercase tracking-widest">
+                          Moderator Feedback
+                        </p>
+                        <p className="text-[11px] font-bold text-red-600 italic">
+                          "{singleProduct.adminNote}"
+                        </p>
+                      </div>
                     )}
                   </div>
 
-                  {/* META */}
-                  <div className="text-xs text-gray-400">
-                    Created:{" "}
-                    {new Date(singleProduct.createdAt).toLocaleString()}
-                    <br />
-                    Updated:{" "}
-                    {new Date(singleProduct.updatedAt).toLocaleString()}
+                  {/* 7. System Metadata */}
+                  <div className="flex justify-between items-center px-4 border-t border-gray-100 pt-6">
+                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">
+                      Entry Date:{" "}
+                      {new Date(singleProduct.createdAt).toLocaleString()}
+                    </p>
+                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">
+                      Last Update:{" "}
+                      {new Date(singleProduct.updatedAt).toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </div>

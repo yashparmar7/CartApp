@@ -10,6 +10,7 @@ import {
   updateProductAPI,
   deleteProductAPI,
   searchProductsAPI,
+  getTopDealsAPI,
 } from "./productAPI";
 
 export const getAllProducts = createAsyncThunk(
@@ -21,6 +22,20 @@ export const getAllProducts = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to fetch products"
+      );
+    }
+  }
+);
+
+export const getTopDeals = createAsyncThunk(
+  "product/getTopDeals",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getTopDealsAPI();
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch top deals"
       );
     }
   }
@@ -135,6 +150,15 @@ export const createProduct = createAsyncThunk(
 
       fd.append("offers", formData.offers);
 
+      // Top Deal fields
+      fd.append("isTopDeal", formData.isTopDeal || false);
+      if (formData.topDealStart) {
+        fd.append("topDealStart", formData.topDealStart);
+      }
+      if (formData.topDealEnd) {
+        fd.append("topDealEnd", formData.topDealEnd);
+      }
+
       images.forEach((img) => {
         fd.append("images", img);
       });
@@ -179,6 +203,15 @@ export const updateProduct = createAsyncThunk(
       removedImages.forEach((imgUrl) => {
         fd.append("removedImages", imgUrl);
       });
+
+      // Top Deal fields
+      fd.append("isTopDeal", formData.isTopDeal || false);
+      if (formData.topDealStart) {
+        fd.append("topDealStart", formData.topDealStart);
+      }
+      if (formData.topDealEnd) {
+        fd.append("topDealEnd", formData.topDealEnd);
+      }
 
       const res = await updateProductAPI(id, fd);
 
@@ -236,6 +269,22 @@ export const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.productsStatus = "failed";
+      })
+
+      .addCase(getTopDeals.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.topDealsStatus = "loading";
+      })
+      .addCase(getTopDeals.fulfilled, (state, action) => {
+        state.loading = false;
+        state.topDeals = action.payload.products;
+        state.topDealsStatus = "succeeded";
+      })
+      .addCase(getTopDeals.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.topDealsStatus = "failed";
       })
 
       .addCase(getSingleProduct.pending, (state) => {
@@ -389,6 +438,7 @@ export const productSlice = createSlice({
 
 // Selectors
 export const selectProducts = (state) => state.product.products;
+export const selectTopDeals = (state) => state.product.topDeals;
 export const selectSingleProduct = (state) => state.product.singleProduct;
 export const selectProductLoading = (state) => state.product.loading;
 export const selectProductError = (state) => state.product.error;

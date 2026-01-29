@@ -130,6 +130,20 @@ const productSchema = new mongoose.Schema(
       type: Date,
     },
 
+    // TOP DEALS
+    isTopDeal: {
+      type: Boolean,
+      default: false,
+    },
+
+    topDealStart: {
+      type: Date,
+    },
+
+    topDealEnd: {
+      type: Date,
+    },
+
     isDeleted: {
       type: Boolean,
       default: false,

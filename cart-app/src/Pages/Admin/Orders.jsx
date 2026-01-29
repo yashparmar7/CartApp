@@ -9,6 +9,15 @@ import {
   RiCloseCircleFill,
   RiFileList3Fill,
   RiShoppingBag3Fill,
+  RiCloseLine,
+  RiUser3Fill,
+  RiPhoneFill,
+  RiMapPin2Fill,
+  RiBankCardFill,
+  RiErrorWarningFill,
+  RiTimeFill,
+  RiShieldCheckFill,
+  RiFlagFill,
 } from "react-icons/ri";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import Loader from "../../components/Loader";
@@ -19,6 +28,27 @@ import {
 } from "../../features/order/orderSlice";
 import Swal from "sweetalert2";
 import { toast } from "react-hot-toast";
+
+{
+  /* Timeline Helper */
+}
+const TimelineItem = ({ label, date, icon, active }) => (
+  <div
+    className={`flex items-start gap-3 ${active ? "opacity-100" : "opacity-30"}`}
+  >
+    <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 mt-1">
+      {icon}
+    </div>
+    <div>
+      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+        {label}
+      </p>
+      <p className="text-[10px] font-bold text-gray-700 mt-1.5">
+        {date ? new Date(date).toLocaleString() : "Pending Event"}
+      </p>
+    </div>
+  </div>
+);
 
 const Orders = () => {
   const dispatch = useDispatch();
@@ -395,264 +425,325 @@ const Orders = () => {
       </div>
 
       {isEditOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-2xl animate-[scaleIn_0.2s_ease-out]">
-            {/* HEADER */}
-            <div className="px-6 py-4 border-b border-gray-300">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-                Update Order
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Manage order status & payment
-              </p>
-            </div>
-
-            {/* BODY */}
-            <div className="px-6 py-5 space-y-4">
-              {/* ORDER ID */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Order ID
-                </label>
-                <input
-                  disabled
-                  value={selectedOrder._id}
-                  className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
-                />
-              </div>
-
-              {/* USER */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  User Email
-                </label>
-                <input
-                  disabled
-                  value={selectedOrder.user?.email || "—"}
-                  className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
-                />
-              </div>
-
-              {/* ORDER STATUS */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Order Status
-                </label>
-                <select
-                  value={selectedOrder.orderStatus}
-                  onChange={(e) =>
-                    setSelectedOrder({
-                      ...selectedOrder,
-                      orderStatus: e.target.value,
-                    })
-                  }
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="placed">Placed</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              {/* PAYMENT STATUS */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Payment Status
-                </label>
-                <select
-                  value={selectedOrder.isPaid ? "paid" : "unpaid"}
-                  onChange={(e) =>
-                    setSelectedOrder({
-                      ...selectedOrder,
-                      isPaid: e.target.value === "paid",
-                    })
-                  }
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="paid">Paid</option>
-                  <option value="unpaid">Unpaid</option>
-                </select>
-              </div>
-
-              {/* TOTAL */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Total Amount
-                </label>
-                <input
-                  disabled
-                  value={`₹${selectedOrder.totalAmount}`}
-                  className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
-                />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-md px-4 transition-all duration-300">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl animate-in zoom-in duration-300 border border-white/20 overflow-hidden">
+            {/* HEADER: Branded & Contextual */}
+            <div className="bg-red-500 p-8 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-1/2 -translate-y-1/2" />
+              <div className="relative z-10">
+                <h2 className="text-2xl font-black uppercase tracking-tight leading-none">
+                  Update <span className="text-red-100">Order</span>
+                </h2>
+                <p className="text-red-100 text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-80">
+                  Logistics & Payment Processing
+                </p>
               </div>
             </div>
 
-            {/* FOOTER */}
-            <div className="px-6 py-4 border-t border-gray-300 flex flex-col sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={() => setIsEditOpen(false)}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg border text-sm text-gray-700 hover:bg-gray-100 transition"
-              >
-                Cancel
-              </button>
+            {/* BODY: Structured Premium Inputs */}
+            <div className="p-8 space-y-6">
+              {/* Read-Only Transaction Card */}
+              <div className="grid grid-cols-2 gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-inner">
+                <div className="min-w-0">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                    Order Ref
+                  </p>
+                  <p className="text-xs font-black text-gray-900 truncate mt-1 italic">
+                    #{selectedOrder._id.slice(-8).toUpperCase()}
+                  </p>
+                </div>
+                <div className="min-w-0 text-right">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                    Revenue
+                  </p>
+                  <p className="text-sm font-black text-red-500 mt-1 italic">
+                    ₹{selectedOrder.totalAmount.toLocaleString()}
+                  </p>
+                </div>
+                <div className="col-span-2 pt-2 mt-2 border-t border-gray-200">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                    Customer Account
+                  </p>
+                  <p className="text-xs font-bold text-gray-700 truncate mt-1">
+                    {selectedOrder.user?.email || "Guest Checkout"}
+                  </p>
+                </div>
+              </div>
 
-              <button
-                onClick={() => handleUpdateOrder(selectedOrder)}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600 transition"
-              >
-                Save Changes
-              </button>
+              {/* Status Selection Logic */}
+              <div className="space-y-4">
+                {/* Order Lifecycle Status */}
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">
+                    Logistics Milestone
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedOrder.orderStatus}
+                      onChange={(e) =>
+                        setSelectedOrder({
+                          ...selectedOrder,
+                          orderStatus: e.target.value,
+                        })
+                      }
+                      className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-gray-50 font-bold text-sm text-gray-800 outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="placed"> Order Placed</option>
+                      <option value="confirmed"> Order Confirmed</option>
+                      <option value="shipped"> Parcel Shipped</option>
+                      <option value="delivered"> Handed to Customer</option>
+                      <option value="cancelled"> Transaction Revoked</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Payment Status */}
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">
+                    Financial Status
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedOrder.isPaid ? "paid" : "unpaid"}
+                      onChange={(e) =>
+                        setSelectedOrder({
+                          ...selectedOrder,
+                          isPaid: e.target.value === "paid",
+                        })
+                      }
+                      className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-gray-50 font-bold text-sm text-gray-800 outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="paid"> Verified: Paid</option>
+                      <option value="unpaid"> Pending: Unpaid</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* ACTIONS: Tactical & Clear */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsEditOpen(false)}
+                  className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all active:scale-95"
+                >
+                  Discard
+                </button>
+                <button
+                  onClick={() => handleUpdateOrder(selectedOrder)}
+                  className="flex-1 py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-200 hover:bg-red-600 transition-all active:scale-95"
+                >
+                  Apply Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {isViewOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden">
-            {/* HEADER */}
-            <div className="px-5 sm:px-6 py-4 border-b flex justify-between items-center">
-              <h2 className="text-lg font-semibold">
-                Order #{selectedOrder._id.slice(-6)}
-              </h2>
+        <div className="fixed inset-0 z-[100] bg-gray-900/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 transition-all duration-500">
+          <div className="bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden border border-white/20 animate-in slide-in-from-bottom-4 duration-500">
+            {/* HEADER: Branded & Fixed */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-50 bg-white sticky top-0 z-20">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200">
+                  <RiShoppingBag3Fill size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight leading-none">
+                    Order <span className="text-red-500">Invoice</span>
+                  </h2>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1.5 italic opacity-70">
+                    Transaction ID: #{selectedOrder._id.toUpperCase()}
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={() => setIsViewOpen(false)}
-                className="text-gray-400 hover:text-red-500 text-xl"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-50 text-gray-400 hover:text-red-500 transition-all hover:bg-red-50 group"
               >
-                ✕
+                <RiCloseLine
+                  size={28}
+                  className="group-hover:rotate-90 transition-transform duration-300"
+                />
               </button>
             </div>
 
-            {/* BODY */}
-            <div className="p-5 sm:p-6 space-y-6 text-sm max-h-[70vh] overflow-y-auto">
-              {/* USER INFO */}
-              <div className="space-y-1">
-                <h3 className="font-semibold text-gray-800">User Info</h3>
-                <p>
-                  <b>Email:</b> {selectedOrder.user?.email}
-                </p>
-              </div>
+            {/* BODY: Scrollable content */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar bg-[#F9FAFB]/50 space-y-10">
+              {/* TOP ROW: USER & SHIPPING INFO */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Account Profile */}
+                <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-4">
+                  <div className="flex items-center gap-3 border-b border-gray-50 pb-3">
+                    <RiUser3Fill className="text-red-500" />
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      Customer Profile
+                    </h3>
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-gray-900 uppercase">
+                      {selectedOrder.shippingAddress.name}
+                    </p>
+                    <p className="text-xs font-bold text-gray-500 italic mt-1">
+                      {selectedOrder.user?.email}
+                    </p>
+                    <p className="text-xs font-black text-red-500 mt-2 flex items-center gap-1">
+                      <RiPhoneFill size={12} />{" "}
+                      {selectedOrder.shippingAddress.phone}
+                    </p>
+                  </div>
+                </div>
 
-              {/* SHIPPING ADDRESS */}
-              <div className="space-y-1">
-                <h3 className="font-semibold text-gray-800">
-                  Shipping Address
-                </h3>
-                <p>{selectedOrder.shippingAddress.name}</p>
-                <p>{selectedOrder.shippingAddress.phone}</p>
-                <p>
-                  {selectedOrder.shippingAddress.address},{" "}
-                  {selectedOrder.shippingAddress.city},{" "}
-                  {selectedOrder.shippingAddress.state} -{" "}
-                  {selectedOrder.shippingAddress.pincode}
-                </p>
-              </div>
-
-              {/* PAYMENT DETAILS */}
-              <div className="space-y-1">
-                <h3 className="font-semibold text-gray-800">Payment Details</h3>
-                <p>
-                  <b>Method:</b> {selectedOrder.payment.method.toUpperCase()}
-                </p>
-                <p>
-                  <b>Payment ID:</b> {selectedOrder.payment.paymentId || "N/A"}
-                </p>
-                <p className="flex items-center gap-2">
-                  <b>Status:</b>
-                  {selectedOrder.payment.status === "paid" ? (
-                    <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-                      <RiCheckboxCircleFill /> Paid
-                    </span>
-                  ) : selectedOrder.payment.status === "pending" ? (
-                    <span className="flex items-center gap-1 text-amber-600 font-semibold">
-                      <RiCheckboxCircleFill /> Pending
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-rose-600 font-semibold">
-                      <FaTimesCircle /> Failed
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              {/* ORDER STATUS */}
-              <div className="space-y-1">
-                <h3 className="font-semibold text-gray-800">Order Status</h3>
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(
-                    selectedOrder.orderStatus,
-                  )}`}
-                >
-                  {selectedOrder.orderStatus}
-                </span>
-              </div>
-
-              {/* ITEMS */}
-              <div>
-                <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
-                <div className="space-y-3">
-                  {selectedOrder.items.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 border rounded-lg p-3"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-14 h-14 object-cover rounded-md border"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium">{item.title}</p>
-                        <p className="text-xs text-gray-500">
-                          ₹{item.price} × {item.quantity}
-                        </p>
-                      </div>
-                      <p className="font-semibold">
-                        ₹{item.price * item.quantity}
-                      </p>
-                    </div>
-                  ))}
+                {/* Shipping Logistics */}
+                <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-4">
+                  <div className="flex items-center gap-3 border-b border-gray-50 pb-3">
+                    <RiMapPin2Fill className="text-red-500" />
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      Delivery Destination
+                    </h3>
+                  </div>
+                  <p className="text-xs font-bold text-gray-600 leading-relaxed uppercase tracking-tight">
+                    {selectedOrder.shippingAddress.address},<br />
+                    {selectedOrder.shippingAddress.city},{" "}
+                    {selectedOrder.shippingAddress.state} —{" "}
+                    {selectedOrder.shippingAddress.pincode}
+                  </p>
                 </div>
               </div>
 
-              {/* TOTAL + TIMESTAMPS */}
-              <div className="space-y-1 border-t pt-4">
-                <p className="text-base font-semibold">
-                  Total Amount: ₹{selectedOrder.totalAmount}
-                </p>
-                <p>
-                  <b>Paid:</b> {selectedOrder.isPaid ? "Yes" : "No"}
-                </p>
-                {selectedOrder.paidAt && (
-                  <p>
-                    <b>Paid At:</b>{" "}
-                    {new Date(selectedOrder.paidAt).toLocaleString()}
+              {/* MIDDLE ROW: PAYMENT & LOGISTICS STATUS */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Payment Method */}
+                <div className="bg-gray-900 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-xl">
+                  <RiBankCardFill className="absolute -right-2 -bottom-2 text-white/5 text-7xl" />
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">
+                    Billing Method
                   </p>
-                )}
-                {selectedOrder.deliveredAt && (
-                  <p>
-                    <b>Delivered At:</b>{" "}
-                    {new Date(selectedOrder.deliveredAt).toLocaleString()}
+                  <p className="text-lg font-black italic uppercase">
+                    {selectedOrder.payment.method}
                   </p>
-                )}
-                <p>
-                  <b>Created:</b>{" "}
-                  {new Date(selectedOrder.createdAt).toLocaleString()}
-                </p>
+                  <p className="text-[10px] text-gray-500 mt-1 truncate">
+                    ID: {selectedOrder.payment.paymentId || "INTERNAL_TX"}
+                  </p>
+                </div>
+
+                {/* Financial Status */}
+                <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                    Payment Verification
+                  </p>
+                  {selectedOrder.payment.status === "paid" ? (
+                    <div className="flex items-center gap-2 text-emerald-600 font-black uppercase text-sm italic">
+                      <RiCheckboxCircleFill size={20} /> Transaction Cleared
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-rose-600 font-black uppercase text-sm italic">
+                      <RiErrorWarningFill size={20} /> Payment Deficit
+                    </div>
+                  )}
+                </div>
+
+                {/* Order State */}
+                <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                    Logistics Milestone
+                  </p>
+                  <div className="flex">
+                    <span
+                      className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${statusBadge(selectedOrder.orderStatus)}`}
+                    >
+                      {selectedOrder.orderStatus}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ITEMS SECTION */}
+              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-gray-50/50 px-8 py-4 border-b border-gray-100">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                    Manifest Itemization
+                  </h3>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {selectedOrder.items.map((item, index) => (
+                    <div
+                      key={index}
+                      className="px-8 py-5 flex items-center gap-6 group hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-100 bg-white p-1 shrink-0 shadow-sm">
+                        <img
+                          src={item.image}
+                          alt=""
+                          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-black text-gray-900 uppercase tracking-tight truncate">
+                          {item.title}
+                        </p>
+                        <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase italic">
+                          Unit Price: ₹{item.price.toLocaleString()} ×{" "}
+                          {item.quantity}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-black text-gray-900 italic tracking-tighter">
+                          ₹{(item.price * item.quantity).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Summary Footer */}
+                <div className="bg-red-50/50 px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-red-100">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">
+                      Total Invoice Value:
+                    </span>
+                    <span className="text-2xl font-black text-gray-900 italic">
+                      ₹{selectedOrder.totalAmount.toLocaleString()}
+                    </span>
+                  </div>
+                  <div
+                    className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase border ${selectedOrder.isPaid ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-rose-50 text-rose-600 border-rose-200"}`}
+                  >
+                    Account Balance:{" "}
+                    {selectedOrder.isPaid ? "Fully Settled" : "Outstanding"}
+                  </div>
+                </div>
+              </div>
+
+              {/* LOGISTICAL TIMELINE */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 px-4">
+                <TimelineItem
+                  label="Entry Timestamp"
+                  date={selectedOrder.createdAt}
+                  icon={<RiTimeFill />}
+                />
+                <TimelineItem
+                  label="Settlement Date"
+                  date={selectedOrder.paidAt}
+                  icon={<RiShieldCheckFill />}
+                  active={selectedOrder.isPaid}
+                />
+                <TimelineItem
+                  label="Delivery Closure"
+                  date={selectedOrder.deliveredAt}
+                  icon={<RiFlagFill />}
+                  active={selectedOrder.orderStatus === "delivered"}
+                />
               </div>
             </div>
 
-            {/* FOOTER */}
-            <div className="px-5 sm:px-6 py-4 border-t flex justify-end">
+            {/* FOOTER ACTIONS */}
+            <div className="px-8 py-6 border-t border-gray-50 bg-white flex justify-end gap-3">
               <button
                 onClick={() => setIsViewOpen(false)}
-                className="px-4 py-2 rounded-lg border hover:bg-gray-100 transition"
+                className="px-8 py-3 bg-gray-900 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-red-500 hover:shadow-red-100 transition-all active:scale-95"
               >
-                Close
+                Close Inspector
               </button>
             </div>
           </div>

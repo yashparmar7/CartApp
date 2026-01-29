@@ -101,3 +101,13 @@ export const searchProductsAPI = (query, category) => {
     console.log(err);
   }
 };
+
+
+export const  getTopDealsAPI = () => {
+  try {
+    const res = axiosInstance.get("/products/getTopDeals");
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};

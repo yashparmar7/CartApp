@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -29,7 +29,7 @@ import { GiRunningShoe, GiLipstick } from "react-icons/gi";
 import { FaTshirt, FaTv, FaHome, FaChevronRight } from "react-icons/fa";
 
 import { getAllCategories } from "../../features/category/categorySlice";
-import { getAllProducts } from "../../features/product/productSlice";
+import { getTopDeals, selectTopDeals } from "../../features/product/productSlice";
 
 const iconMap = {
   Mobiles: MdPhoneAndroid,
@@ -49,12 +49,40 @@ const HomePage = () => {
   const { categories, loading, status } = useSelector(
     (state) => state.category,
   );
-  const { productsStatus } = useSelector((state) => state.product);
+  const { topDealsStatus, topDeals } = useSelector((state) => state.product);
+  const [countdown, setCountdown] = useState("");
+
+useEffect(() => {
+  const endTime = new Date();
+  endTime.setHours(endTime.getHours() + 3);
+
+  const timer = setInterval(() => {
+    const now = new Date();
+    const diff = endTime - now;
+
+    if (diff <= 0) {
+      clearInterval(timer);
+      setCountdown("");
+      return;
+    }
+
+    const h = Math.floor(diff / (1000 * 60 * 60));
+    const m = Math.floor((diff / (1000 * 60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+
+    setCountdown(
+      `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+    );
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, []);
+
 
   useEffect(() => {
     if (status === "idle") dispatch(getAllCategories());
-    if (productsStatus === "idle") dispatch(getAllProducts());
-  }, [dispatch, status, productsStatus]);
+    if (topDealsStatus === "idle") dispatch(getTopDeals());
+  }, [dispatch, status, topDealsStatus]);
 
   const activeCategories = categories.filter((cat) => cat.isActive === true);
 
@@ -168,9 +196,11 @@ const HomePage = () => {
             <div className="flex items-center gap-3">
               <RiFlashlightFill className="text-yellow-500 text-2xl" />
               <h2 className="text-xl font-bold text-gray-800">Top Deals</h2>
-              <div className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-mono hidden md:block">
-                04:22:15 Left
-              </div>
+              {countdown && (
+                <div className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-mono hidden md:block">
+                  {countdown}
+                </div>
+              )}
             </div>
             <button
               onClick={() => navigate("/shop")}
@@ -180,7 +210,7 @@ const HomePage = () => {
             </button>
           </div>
 
-          <div className="p-4">{loading ? <Loader /> : <Card />}</div>
+          <div className="p-4">{loading ? <Loader /> : <Card products={topDeals} />}</div>
         </div>
       </section>
 

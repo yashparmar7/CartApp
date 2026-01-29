@@ -2,91 +2,105 @@
 
 html,
 body {
-    overflow-x: hidden;
+  overflow-x: hidden;
 }
 
-
 .loader {
-    width: 30px;
-    aspect-ratio: 1;
-    position: relative;
+  width: 30px;
+  aspect-ratio: 1;
+  position: relative;
 }
 
 .loader:before,
 .loader:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: -8px 0 0 -8px;
-    width: 16px;
-    aspect-ratio: 1;
-    background: #fb923c;
-    animation:
-        l2-1 2s infinite,
-        l2-2 1s infinite;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: -8px 0 0 -8px;
+  width: 16px;
+  aspect-ratio: 1;
+  background: #fb923c;
+  animation:
+    l2-1 2s infinite,
+    l2-2 1s infinite;
 }
 
 .loader:after {
-    background: #ef4444;
-    animation-delay: -1s, 0s;
+  background: #ef4444;
+  animation-delay: -1s, 0s;
 }
 
 @keyframes l2-1 {
-    0% {
-        top: 0;
-        left: 0
-    }
+  0% {
+    top: 0;
+    left: 0;
+  }
 
-    25% {
-        top: 100%;
-        left: 0
-    }
+  25% {
+    top: 100%;
+    left: 0;
+  }
 
-    50% {
-        top: 100%;
-        left: 100%
-    }
+  50% {
+    top: 100%;
+    left: 100%;
+  }
 
-    75% {
-        top: 0;
-        left: 100%
-    }
+  75% {
+    top: 0;
+    left: 100%;
+  }
 
-    100% {
-        top: 0;
-        left: 0
-    }
+  100% {
+    top: 0;
+    left: 0;
+  }
 }
 
 @keyframes l2-2 {
+  40%,
+  50% {
+    transform: rotate(0.25turn) scale(0.5);
+  }
 
-    40%,
-    50% {
-        transform: rotate(0.25turn) scale(0.5)
-    }
-
-    100% {
-        transform: rotate(0.5turn) scale(1)
-    }
+  100% {
+    transform: rotate(0.5turn) scale(1);
+  }
 }
 
 @keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer components {
+  .form-input-premium {
+    @apply w-full
+      px-5 py-4
+      rounded-2xl
+      border border-gray-200
+      bg-white
+      text-sm font-medium text-gray-800
+      outline-none
+      transition-all
+      focus:border-red-500
+      focus:ring-4 focus:ring-red-500/10
+      placeholder:text-gray-400;
+  }
 }
 
 .input {
-    @apply w-full h-11 border rounded-lg px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-500;
+  @apply w-full h-11 border rounded-lg px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-500;
 }
 
 .payment-option {
-    @apply flex items-center gap-4 border rounded-lg p-4 cursor-pointer hover:border-red-500 text-sm;
+  @apply flex items-center gap-4 border rounded-lg p-4 cursor-pointer hover:border-red-500 text-sm;
 }

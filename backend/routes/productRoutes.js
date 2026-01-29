@@ -3,10 +3,12 @@ const router = express.Router();
 const upload = require("../middleware/uploads");
 const {
   createProduct,
+  updateProduct,
   createCategory,
   getAllProducts,
   getSingleProduct,
   searchProducts,
+  getTopDeals,
 } = require("../controllers/productController");
 const auth = require("../middleware/authMiddleware.js");
 
@@ -17,5 +19,6 @@ router.get("/getAllProducts", getAllProducts);
 router.get("/getSingleProduct/:id", auth, getSingleProduct);
 
 router.get("/searchProducts", searchProducts);
+router.get("/top-deals", getTopDeals);
 
 module.exports = router;

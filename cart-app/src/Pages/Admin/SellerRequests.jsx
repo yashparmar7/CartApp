@@ -19,6 +19,10 @@ import {
   RiPhoneLine,
   RiShieldUserLine,
   RiUserAddFill,
+  RiSave3Fill,
+  RiInformationFill,
+  RiArrowDownSLine,
+  RiShieldUserFill,
 } from "react-icons/ri";
 import Swal from "sweetalert2";
 
@@ -485,78 +489,105 @@ const SellerRequests = () => {
 
       {/* EDIT ROLE MODAL */}
       {isEditOpen && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray/50 backdrop-blur-sm px-4">
-          <div className="w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-2xl animate-[scaleIn_0.2s_ease-out]">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-300">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-                Edit User Role
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Update role permissions carefully
-              </p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-md px-4 transition-all duration-300">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl animate-in zoom-in duration-300 border border-white/20 overflow-hidden">
+            {/* HEADER: High-Security Contrast */}
+            <div className="bg-gray-900 p-8 text-white relative overflow-hidden shrink-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-1/2 -translate-y-1/2 border border-white/10" />
+              <div className="relative z-10 flex items-center gap-4">
+                <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20">
+                  <RiShieldUserFill size={24} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black uppercase tracking-tight leading-none">
+                    Privilege <span className="text-red-500">Control</span>
+                  </h2>
+                  <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-80">
+                    Identity & Access Management
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {/* Body */}
-            <div className="px-6 py-5 space-y-4">
-              {/* Username */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Username
-                </label>
-                <input
-                  disabled
-                  value={
-                    selectedUser?.user?.userName || selectedUser?.shopName || ""
-                  }
-                  className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
-                />
+            {/* BODY: Structured Premium Inputs */}
+            <div className="p-8 space-y-6">
+              {/* Read-Only Identity Card */}
+              <div className="p-5 bg-gray-50 rounded-3xl border border-gray-100 space-y-4 shadow-inner">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-black text-gray-400 text-xs">
+                    {(
+                      selectedUser?.user?.userName ||
+                      selectedUser?.shopName ||
+                      "U"
+                    )
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                      Account Identity
+                    </p>
+                    <p className="text-sm font-black text-gray-900 truncate mt-1 uppercase tracking-tight">
+                      {selectedUser?.user?.userName || selectedUser?.shopName}
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-gray-200/60">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                    Verified Channel
+                  </p>
+                  <p className="text-xs font-bold text-gray-600 truncate mt-1 italic group-hover:text-red-500 transition-colors">
+                    {selectedUser?.user?.email || selectedUser?.email}
+                  </p>
+                </div>
               </div>
 
-              {/* Email */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Email
-                </label>
-                <input
-                  disabled
-                  value={selectedUser?.user?.email || selectedUser?.email || ""}
-                  className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
-                />
+              {/* Role Selection Logic */}
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">
+                    Assign Role
+                  </label>
+                  <div className="relative group">
+                    <select
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-gray-50 font-black text-sm text-gray-800 outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="USER">User</option>
+                      <option value="SELLER">Seller</option>
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
+                      <RiArrowDownSLine size={20} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex items-start gap-3">
+                  <RiInformationFill className="text-amber-500 mt-0.5 shrink-0" />
+                  <p className="text-[10px] font-bold text-amber-700 leading-relaxed uppercase tracking-tight">
+                    Changes to role take effect immediately. Ensure the user has
+                    been verified before assigning a role.
+                  </p>
+                </div>
               </div>
 
-              {/* Role */}
-              <div>
-                <label className="text-xs font-medium text-gray-500">
-                  Role
-                </label>
-                <select
-                  value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              {/* ACTIONS: Large & Tactile */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsEditOpen(false)}
+                  className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all active:scale-95"
                 >
-                  <option value="USER">User</option>
-                  <option value="SELLER">Seller</option>
-                </select>
+                  Discard
+                </button>
+                <button
+                  onClick={handleUpdateRole}
+                  className="flex-1 py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-200 hover:bg-red-600 transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <RiSave3Fill size={18} />
+                  Commit Changes
+                </button>
               </div>
-            </div>
-
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-300 flex flex-col sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={() => setIsEditOpen(false)}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg border text-sm text-gray-700 hover:bg-gray-100 transition"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={handleUpdateRole}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600 transition"
-              >
-                Save Changes
-              </button>
             </div>
           </div>
         </div>

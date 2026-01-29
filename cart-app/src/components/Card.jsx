@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-import { RiShoppingCartLine, RiHeartLine } from "react-icons/ri";
+import { RiShoppingCartLine, RiHeartLine, RiFlashlightFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleProduct } from "../features/product/productSlice";
 import { addToCart } from "../features/cart/cartSlice";
@@ -48,10 +48,23 @@ const Card = ({ products: propProducts }) => {
 
   if (loading) return <Loader />;
 
+  if (!products || products.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <RiFlashlightFill className="text-yellow-500 text-6xl mx-auto mb-4" />
+        <h3 className="text-xl font-bold text-gray-800 mb-2">No Top Deals Available</h3>
+        <p className="text-gray-500">Check back later for amazing offers!</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6">
       {products.map((product) => {
         const { price, mrp, discountPercentage } = product.pricing || {};
+        const isTopDeal = product.isTopDeal;
+        const topDealEnd = product.topDealEnd;
+        const stock = product.stock;
 
         return (
           <div
@@ -65,11 +78,20 @@ const Card = ({ products: propProducts }) => {
               <div className="absolute top-2 left-2 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
                 -{discountPercentage}%
               </div>
-              
-              {/* Wishlist Icon */}
-              <button className="absolute top-2 right-2 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full text-gray-400 hover:text-red-500 hover:bg-white transition-all shadow-sm">
-                <RiHeartLine size={16} />
-              </button>
+
+              {/* Top Deal Badge */}
+              {isTopDeal && (
+                <div className="absolute top-2 right-2 z-10 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
+                  🔥 Top Deal
+                </div>
+              )}
+
+              {/* Limited Time Badge */}
+              {topDealEnd && new Date(topDealEnd) > new Date() && (
+                <div className="absolute bottom-2 left-2 z-10 bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
+                  ⏳ Limited Time
+                </div>
+              )}
 
               <img
                 src={product.image?.[0]}
@@ -104,7 +126,13 @@ const Card = ({ products: propProducts }) => {
                     ₹{mrp?.toLocaleString()}
                   </span>
                 </div>
-                
+
+                {stock <= 10 && stock > 0 && (
+                  <p className="text-[11px] text-orange-600 font-bold mt-1 flex items-center gap-1">
+                    <span className="w-1 h-1 bg-orange-600 rounded-full"></span> Only {stock} left
+                  </p>
+                )}
+
                 <p className="text-[11px] text-green-600 font-bold mt-1.5 flex items-center gap-1">
                   <span className="w-1 h-1 bg-green-600 rounded-full"></span> Free Delivery
                 </p>
