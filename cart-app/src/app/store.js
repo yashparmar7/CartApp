@@ -6,6 +6,7 @@ import sellerRequestReducer from "../features/sellerRequest/sellerRequestSlice";
 import categoryReducer from "../features/category/categorySlice";
 import roleReducer from "../features/role/roleSlice";
 import orderReducer from "../features/order/orderSlice";
+import reviewReducer from "../features/review/reviewSlice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     category: categoryReducer,
     role: roleReducer,
     order: orderReducer,
+    review: reviewReducer,
   },
 });
 

@@ -10,7 +10,7 @@ const reviewSchema = new mongoose.Schema(
 
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "AuthUser",
       required: true,
     },
 
@@ -26,7 +26,7 @@ const reviewSchema = new mongoose.Schema(
       trim: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 reviewSchema.index({ product: 1, user: 1 }, { unique: true });

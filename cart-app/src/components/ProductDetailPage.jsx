@@ -17,6 +17,7 @@ import { selectIsAuthenticated } from "../features/auth/authSlice";
 import { useParams, useNavigate } from "react-router-dom";
 import Loader from "./Loader";
 import { toast } from "react-hot-toast";
+import ProductReviewPage from "./ProductReviewPage";
 
 const ProductDetailPage = () => {
   const [activeImage, setActiveImage] = useState("");
@@ -24,7 +25,9 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const { singleProduct, loading, error } = useSelector((state) => state.product);
+  const { singleProduct, loading, error } = useSelector(
+    (state) => state.product,
+  );
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
@@ -57,7 +60,12 @@ const ProductDetailPage = () => {
   };
 
   if (loading) return <Loader />;
-  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">{error}</div>;
+  if (error)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">
+        {error}
+      </div>
+    );
   if (!singleProduct?._id) return null;
 
   const { price, mrp, discountPercentage } = singleProduct.pricing || {};
@@ -69,19 +77,32 @@ const ProductDetailPage = () => {
       <main className="max-w-[1400px] mx-auto px-4 py-4 md:py-8">
         {/* Breadcrumbs - Professional touch */}
         <nav className="text-xs text-gray-500 mb-4 flex gap-2">
-          <span className="cursor-pointer hover:text-red-500" onClick={() => navigate("/")}>Home</span> / 
-          <span className="cursor-pointer hover:text-red-500" onClick={() => navigate("/shop")}>Shop</span> / 
-          <span className="text-gray-900 font-medium truncate">{singleProduct.title}</span>
+          <span
+            className="cursor-pointer hover:text-red-500"
+            onClick={() => navigate("/")}
+          >
+            Home
+          </span>{" "}
+          /
+          <span
+            className="cursor-pointer hover:text-red-500"
+            onClick={() => navigate("/shop")}
+          >
+            Shop
+          </span>{" "}
+          /
+          <span className="text-gray-900 font-medium truncate">
+            {singleProduct.title}
+          </span>
         </nav>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-4 md:p-8">
-            
             {/* LEFT: IMAGE GALLERY (Lg: 5 columns) */}
             <div className="lg:col-span-5 flex flex-col gap-4">
               <div className="relative group aspect-square rounded-xl bg-white border border-gray-100 flex items-center justify-center overflow-hidden">
                 <img
-                  src={activeImage}
+                  src={activeImage || null}
                   alt={singleProduct.title}
                   className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-110"
                 />
@@ -98,10 +119,16 @@ const ProductDetailPage = () => {
                       key={index}
                       onClick={() => setActiveImage(img)}
                       className={`w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-lg border-2 transition-all overflow-hidden ${
-                        activeImage === img ? "border-red-500 shadow-md" : "border-gray-100 opacity-70 hover:opacity-100"
+                        activeImage === img
+                          ? "border-red-500 shadow-md"
+                          : "border-gray-100 opacity-70 hover:opacity-100"
                       }`}
                     >
-                      <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                      <img
+                        src={img}
+                        alt="thumb"
+                        className="w-full h-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>
@@ -113,20 +140,31 @@ const ProductDetailPage = () => {
               <div className="border-b border-gray-100 pb-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-red-600 text-xs font-bold uppercase tracking-widest">{singleProduct.brand}</span>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-1">{singleProduct.title}</h1>
+                    <span className="text-red-600 text-xs font-bold uppercase tracking-widest">
+                      {singleProduct.brand}
+                    </span>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-1">
+                      {singleProduct.title}
+                    </h1>
                   </div>
-                  <button className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition"><FaShareAlt /></button>
+                  <button className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition">
+                    <FaShareAlt />
+                  </button>
                 </div>
 
                 {/* Rating & Stock */}
                 <div className="flex items-center gap-4 mt-3">
                   <div className="flex items-center gap-1.5 bg-green-600 text-white px-2.5 py-1 rounded-md text-sm font-bold">
-                    {singleProduct.ratings?.average || 0} <FaStar className="text-[10px]" />
+                    {singleProduct.ratings?.average || 0}{" "}
+                    <FaStar className="text-[10px]" />
                   </div>
-                  <span className="text-sm text-gray-500 font-medium">{singleProduct.ratings?.count || 0} Ratings & Reviews</span>
-                  <span className={`text-sm font-bold px-2 py-0.5 rounded ${singleProduct.stock > 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>
-                    {singleProduct.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                  <span className="text-sm text-gray-500 font-medium">
+                    {singleProduct.ratings?.count || 0} Ratings & Reviews
+                  </span>
+                  <span
+                    className={`text-sm font-bold px-2 py-0.5 rounded ${singleProduct.stock > 0 ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"}`}
+                  >
+                    {singleProduct.stock > 0 ? "In Stock" : "Out of Stock"}
                   </span>
                 </div>
               </div>
@@ -134,26 +172,45 @@ const ProductDetailPage = () => {
               {/* Pricing Section */}
               <div className="py-6 bg-red-50/30 px-4 rounded-xl mt-4">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-black text-gray-900">₹{price?.toLocaleString()}</span>
-                  <span className="text-lg text-gray-400 line-through">₹{mrp?.toLocaleString()}</span>
-                  <span className="text-red-500 font-bold text-lg">{discountPercentage}% OFF</span>
+                  <span className="text-4xl font-black text-gray-900">
+                    ₹{price?.toLocaleString()}
+                  </span>
+                  <span className="text-lg text-gray-400 line-through">
+                    ₹{mrp?.toLocaleString()}
+                  </span>
+                  <span className="text-red-500 font-bold text-lg">
+                    {discountPercentage}% OFF
+                  </span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">{singleProduct.delivery?.cost === "Free" ? "Free delivery available on this item" : `Delivery charges: ₹${singleProduct.delivery?.cost}`}</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {singleProduct.delivery?.cost === "Free"
+                    ? "Free delivery available on this item"
+                    : `Delivery charges: ₹${singleProduct.delivery?.cost}`}
+                </p>
               </div>
 
               {/* Offers Section */}
               <div className="mt-6">
-                <h3 className="text-sm font-bold uppercase text-gray-400 tracking-wider mb-3">Available Offers</h3>
+                <h3 className="text-sm font-bold uppercase text-gray-400 tracking-wider mb-3">
+                  Available Offers
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {singleProduct.offers?.length > 0 ? singleProduct.offers.map((offer, index) => (
-                    <div key={index} className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white">
-                      <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />
-                      <p className="text-xs text-gray-700">{offer}</p>
-                    </div>
-                  )) : (
+                  {singleProduct.offers?.length > 0 ? (
+                    singleProduct.offers.map((offer, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white"
+                      >
+                        <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />
+                        <p className="text-xs text-gray-700">{offer}</p>
+                      </div>
+                    ))
+                  ) : (
                     <div className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white">
                       <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />
-                      <p className="text-xs text-gray-700">No offers available at the moment.</p>
+                      <p className="text-xs text-gray-700">
+                        No offers available at the moment.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -162,16 +219,25 @@ const ProductDetailPage = () => {
               {/* Trust Indicators */}
               <div className="grid grid-cols-3 gap-2 py-6 border-y border-gray-100 my-6">
                 <div className="flex flex-col items-center text-center">
-                  <RiArrowLeftRightLine className="text-red-500 mb-1" size={20} />
-                  <span className="text-[10px] font-bold text-gray-600 uppercase">7 Days Replacement</span>
+                  <RiArrowLeftRightLine
+                    className="text-red-500 mb-1"
+                    size={20}
+                  />
+                  <span className="text-[10px] font-bold text-gray-600 uppercase">
+                    7 Days Replacement
+                  </span>
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <RiTruckLine className="text-red-500 mb-1" size={20} />
-                  <span className="text-[10px] font-bold text-gray-600 uppercase">{singleProduct.delivery?.estimated || "3-5 Days"} Delivery</span>
+                  <span className="text-[10px] font-bold text-gray-600 uppercase">
+                    {singleProduct.delivery?.estimated || "3-5 Days"} Delivery
+                  </span>
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <RiShieldCheckLine className="text-red-500 mb-1" size={20} />
-                  <span className="text-[10px] font-bold text-gray-600 uppercase">1 Year Warranty</span>
+                  <span className="text-[10px] font-bold text-gray-600 uppercase">
+                    1 Year Warranty
+                  </span>
                 </div>
               </div>
 
@@ -195,12 +261,15 @@ const ProductDetailPage = () => {
 
           {/* Detailed Description Section */}
           <div className="border-t border-gray-100 p-6 md:p-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Product Specifications</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Product Specifications
+            </h3>
             <div className="prose prose-sm max-w-none text-gray-600 leading-loose">
               {singleProduct.description}
             </div>
           </div>
         </div>
+        <ProductReviewPage />
       </main>
     </div>
   );
