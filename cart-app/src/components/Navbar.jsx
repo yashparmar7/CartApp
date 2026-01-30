@@ -231,19 +231,22 @@ const Navbar = () => {
                 close={() => setOpen(false)}
               />
               <div className="h-[1px] bg-gray-100 my-2 mx-4"></div>
-              {user?.role !== "USER" ? (
+              {user && user.role !== "USER" && (
                 <MobileNavLink
-                  to={getDashboardPath(user?.role)}
+                  to={getDashboardPath(user.role)}
                   label="Dashboard"
                   close={() => setOpen(false)}
                 />
-              ) : (
+              )}
+
+              {user && user.role === "USER" && (
                 <MobileNavLink
                   to="/become-seller"
                   label="Seller Hub"
                   close={() => setOpen(false)}
                 />
               )}
+
               <MobileNavLink
                 to="/about"
                 label="About Us"

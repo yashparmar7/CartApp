@@ -16,7 +16,7 @@ router.post("/createProduct", upload.array("images", 5), auth, createProduct);
 router.post("/createCategory", auth, createCategory);
 
 router.get("/getAllProducts", getAllProducts);
-router.get("/getSingleProduct/:id", auth, getSingleProduct);
+router.get("/getSingleProduct/:id", getSingleProduct);
 
 router.get("/searchProducts", searchProducts);
 router.get("/top-deals", getTopDeals);
