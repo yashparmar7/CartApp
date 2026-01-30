@@ -256,7 +256,7 @@ const ProductReviewPage = () => {
           <div className="flex justify-center mt-4">
             <button
               onClick={() => setVisibleCount(3)}
-              className="text-xs text-gray-400 hover:text-red-500 transition"
+              className="px-8 py-3 border border-red-500 text-red-500 rounded-full text-sm font-bold hover:bg-red-50 transition"
             >
               Show less
             </button>
