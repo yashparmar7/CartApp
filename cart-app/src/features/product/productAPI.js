@@ -93,8 +93,8 @@ export const searchProductsAPI = (query, category) => {
   try {
     const res = axiosInstance.get(
       `/products/searchProducts?query=${encodeURIComponent(
-        query
-      )}&category=${encodeURIComponent(category)}`
+        query,
+      )}&category=${encodeURIComponent(category)}`,
     );
     return res;
   } catch (err) {
@@ -102,10 +102,9 @@ export const searchProductsAPI = (query, category) => {
   }
 };
 
-
-export const  getTopDealsAPI = () => {
+export const getTopDealsAPI = () => {
   try {
-    const res = axiosInstance.get("/products/getTopDeals");
+    const res = axiosInstance.get("/products/top-deals");
     return res;
   } catch (err) {
     console.log(err);

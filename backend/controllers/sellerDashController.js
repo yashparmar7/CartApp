@@ -29,7 +29,7 @@ const getMyProducts = async (req, res) => {
           ...product.toObject(),
           dynamicOrderCount: orderCount,
         };
-      })
+      }),
     );
 
     res.status(200).json({
@@ -112,8 +112,8 @@ const createProduct = async (req, res) => {
     const parsedOffers = Array.isArray(offers)
       ? offers
       : typeof offers === "string"
-      ? offers.split(",").map((o) => o.trim())
-      : [];
+        ? offers.split(",").map((o) => o.trim())
+        : [];
 
     const parsedDelivery =
       typeof delivery === "string" ? JSON.parse(delivery) : delivery;
@@ -166,6 +166,9 @@ const updateProduct = async (req, res) => {
       category,
       offers,
       delivery,
+      isTopDeal,
+      topDealStart,
+      topDealEnd,
     } = req.body;
 
     if (
@@ -194,6 +197,27 @@ const updateProduct = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    // Top Deal validation
+    if (isTopDeal === true || isTopDeal === "true") {
+      if (!topDealStart || !topDealEnd) {
+        return res.status(400).json({
+          message:
+            "Top Deal start and end times are required when marking as Top Deal",
+        });
+      }
+      const start = new Date(topDealStart);
+      const end = new Date(topDealEnd);
+      if (end <= start) {
+        return res.status(400).json({
+          message: "Top Deal end time must be greater than start time",
+        });
+      }
+    } else if (isTopDeal === false || isTopDeal === "false") {
+      // Clear Top Deal dates if not a Top Deal
+      req.body.topDealStart = null;
+      req.body.topDealEnd = null;
+    }
+
     // Handle images: remove specified images and append new ones
     let updatedImages = existingProduct.image || [];
 
@@ -203,7 +227,7 @@ const updateProduct = async (req, res) => {
         ? req.body.removedImages
         : [req.body.removedImages];
       updatedImages = updatedImages.filter(
-        (img) => !removedImages.includes(img)
+        (img) => !removedImages.includes(img),
       );
     }
 
@@ -217,8 +241,8 @@ const updateProduct = async (req, res) => {
     const parsedOffers = Array.isArray(offers)
       ? offers
       : typeof offers === "string"
-      ? offers.split(",").map((o) => o.trim())
-      : existingProduct.offers;
+        ? offers.split(",").map((o) => o.trim())
+        : existingProduct.offers;
 
     const parsedDelivery =
       typeof delivery === "string"
@@ -226,7 +250,7 @@ const updateProduct = async (req, res) => {
         : delivery || existingProduct.delivery;
 
     const discount = Math.round(
-      ((Number(mrp) - Number(price)) / Number(mrp)) * 100
+      ((Number(mrp) - Number(price)) / Number(mrp)) * 100,
     );
 
     const updateData = {
@@ -245,6 +269,10 @@ const updateProduct = async (req, res) => {
       image: updatedImages,
       status: "PENDING",
       isActive: false,
+      // Top Deal fields
+      isTopDeal: isTopDeal === true || isTopDeal === "true" ? true : false,
+      topDealStart: isTopDeal ? topDealStart : null,
+      topDealEnd: isTopDeal ? topDealEnd : null,
     };
 
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, {

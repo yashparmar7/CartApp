@@ -21,10 +21,10 @@ export const getAllProducts = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch products"
+        err.response?.data?.message || "Failed to fetch products",
       );
     }
-  }
+  },
 );
 
 export const getTopDeals = createAsyncThunk(
@@ -35,10 +35,10 @@ export const getTopDeals = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch top deals"
+        err.response?.data?.message || "Failed to fetch top deals",
       );
     }
-  }
+  },
 );
 
 export const getSingleProduct = createAsyncThunk(
@@ -49,10 +49,10 @@ export const getSingleProduct = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch product"
+        err.response?.data?.message || "Failed to fetch product",
       );
     }
-  }
+  },
 );
 
 export const getAllProductsAdmin = createAsyncThunk(
@@ -63,10 +63,10 @@ export const getAllProductsAdmin = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch products"
+        err.response?.data?.message || "Failed to fetch products",
       );
     }
-  }
+  },
 );
 
 export const updateSellerProductStatus = createAsyncThunk(
@@ -80,10 +80,10 @@ export const updateSellerProductStatus = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to update product status"
+        err.response?.data?.message || "Failed to update product status",
       );
     }
-  }
+  },
 );
 
 export const softDeleteSellerProduct = createAsyncThunk(
@@ -94,10 +94,10 @@ export const softDeleteSellerProduct = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to delete product"
+        err.response?.data?.message || "Failed to delete product",
       );
     }
-  }
+  },
 );
 
 export const getSellerMyProducts = createAsyncThunk(
@@ -108,10 +108,10 @@ export const getSellerMyProducts = createAsyncThunk(
       return res.data.products;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch products"
+        err.response?.data?.message || "Failed to fetch products",
       );
     }
-  }
+  },
 );
 
 export const searchProducts = createAsyncThunk(
@@ -122,10 +122,10 @@ export const searchProducts = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to search products"
+        err.response?.data?.message || "Failed to search products",
       );
     }
-  }
+  },
 );
 
 export const createProduct = createAsyncThunk(
@@ -168,10 +168,10 @@ export const createProduct = createAsyncThunk(
       return res.data.product;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to create product"
+        err.response?.data?.message || "Failed to create product",
       );
     }
-  }
+  },
 );
 
 export const updateProduct = createAsyncThunk(
@@ -218,10 +218,10 @@ export const updateProduct = createAsyncThunk(
       return res.data.product;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to update product"
+        err.response?.data?.message || "Failed to update product",
       );
     }
-  }
+  },
 );
 
 export const deleteProduct = createAsyncThunk(
@@ -232,21 +232,23 @@ export const deleteProduct = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to delete product"
+        err.response?.data?.message || "Failed to delete product",
       );
     }
-  }
+  },
 );
 
 const initialState = {
   products: [],
   singleProduct: {},
   myProducts: [],
+  topDeals: [],
   loading: false,
   error: null,
   productsStatus: "idle",
   productsAdminStatus: "idle",
   sellerProductsStatus: "idle",
+  topDealsStatus: "idle",
 };
 export const productSlice = createSlice({
   name: "product",
@@ -328,7 +330,7 @@ export const productSlice = createSlice({
         const updatedProduct = action.payload.product;
 
         state.products = state.products.map((product) =>
-          product._id === updatedProduct._id ? updatedProduct : product
+          product._id === updatedProduct._id ? updatedProduct : product,
         );
       })
       .addCase(updateSellerProductStatus.rejected, (state, action) => {
@@ -345,11 +347,11 @@ export const productSlice = createSlice({
         state.loading = false;
 
         state.products = state.products.filter(
-          (product) => product._id !== action.payload._id
+          (product) => product._id !== action.payload._id,
         );
 
         state.myProducts = state.myProducts.filter(
-          (product) => product._id !== action.payload._id
+          (product) => product._id !== action.payload._id,
         );
       })
 
@@ -397,7 +399,7 @@ export const productSlice = createSlice({
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.loading = false;
         state.myProducts = state.myProducts.map((product) =>
-          product._id === action.payload._id ? action.payload : product
+          product._id === action.payload._id ? action.payload : product,
         );
       })
       .addCase(updateProduct.rejected, (state, action) => {
@@ -413,7 +415,7 @@ export const productSlice = createSlice({
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.loading = false;
         state.myProducts = state.myProducts.filter(
-          (product) => product._id !== action.payload._id
+          (product) => product._id !== action.payload._id,
         );
       })
       .addCase(deleteProduct.rejected, (state, action) => {
