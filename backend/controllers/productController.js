@@ -35,7 +35,13 @@ const createProduct = async (req, res) => {
       req.body.topDealEnd = null;
     }
 
-    const productData = { ...req.body, seller: req.user._id };
+    const productData = {
+      ...req.body,
+      seller: req.user._id,
+      isTopDeal: Boolean(req.body.isTopDeal),
+      topDealStart: req.body.isTopDeal ? new Date(req.body.topDealStart) : null,
+      topDealEnd: req.body.isTopDeal ? new Date(req.body.topDealEnd) : null,
+    };
     const product = await Product.create(productData);
     res.status(201).json({ message: "Product created successfully", product });
   } catch (err) {

@@ -229,13 +229,13 @@ const MyProducts = () => {
     delivery: {
       estimated: product.delivery?.estimated,
       cost: product.delivery?.cost,
-      codAvailable: product.delivery?.codAvailable,
+      codAvailable: Boolean(product.delivery?.codAvailable),
     },
     offers: product.offers,
-    isActive: product.isActive,
+    isActive: Boolean(product.isActive),
     status: product.status,
     // Top Deal fields
-    isTopDeal: product.isTopDeal || false,
+    isTopDeal: Boolean(product.isTopDeal),
     topDealStart: product.topDealStart
       ? new Date(product.topDealStart).toISOString().slice(0, 16)
       : "",
@@ -470,7 +470,20 @@ const MyProducts = () => {
                   </button>
                   <button
                     onClick={() => {
-                      setSelectedProduct(product);
+                      const formattedProduct = {
+                        ...product,
+                        topDealStart: product.topDealStart
+                          ? new Date(product.topDealStart)
+                              .toISOString()
+                              .slice(0, 16)
+                          : "",
+                        topDealEnd: product.topDealEnd
+                          ? new Date(product.topDealEnd)
+                              .toISOString()
+                              .slice(0, 16)
+                          : "",
+                      };
+                      setSelectedProduct(formattedProduct);
                       setExistingImages(product.image || []);
                       setRemovedImages([]);
                       setImages([]);
@@ -961,6 +974,7 @@ const MyProducts = () => {
                     <InputGroup label="Campaign Launch (Date/Time)">
                       <input
                         type="datetime-local"
+                        min={new Date().toISOString().slice(0, 16)}
                         value={formData.topDealStart}
                         onChange={(e) =>
                           setFormData({
@@ -974,6 +988,10 @@ const MyProducts = () => {
                     <InputGroup label="Campaign Expiry (Date/Time)">
                       <input
                         type="datetime-local"
+                        min={
+                          formData.topDealStart ||
+                          new Date().toISOString().slice(0, 16)
+                        }
                         value={formData.topDealEnd}
                         onChange={(e) =>
                           setFormData({
@@ -1336,6 +1354,7 @@ const MyProducts = () => {
                     <InputGroup label="Activation Date">
                       <input
                         type="datetime-local"
+                        min={new Date().toISOString().slice(0, 16)}
                         value={selectedProduct.topDealStart || ""}
                         onChange={(e) =>
                           setSelectedProduct({
@@ -1349,6 +1368,10 @@ const MyProducts = () => {
                     <InputGroup label="Expiration Date">
                       <input
                         type="datetime-local"
+                        min={
+                          selectedProduct.topDealStart ||
+                          new Date().toISOString().slice(0, 16)
+                        }
                         value={selectedProduct.topDealEnd || ""}
                         onChange={(e) =>
                           setSelectedProduct({

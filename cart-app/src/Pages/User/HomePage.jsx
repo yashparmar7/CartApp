@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -29,7 +29,7 @@ import { GiRunningShoe, GiLipstick } from "react-icons/gi";
 import { FaTshirt, FaTv, FaHome, FaChevronRight } from "react-icons/fa";
 
 import { getAllCategories } from "../../features/category/categorySlice";
-import { getTopDeals, selectTopDeals } from "../../features/product/productSlice";
+import { getTopDeals } from "../../features/product/productSlice";
 
 const iconMap = {
   Mobiles: MdPhoneAndroid,
@@ -52,16 +52,54 @@ const HomePage = () => {
   const { topDealsStatus, topDeals } = useSelector((state) => state.product);
   const [countdown, setCountdown] = useState("");
 
-useEffect(() => {
-  const endTime = new Date();
-  endTime.setHours(endTime.getHours() + 3);
-
-  const timer = setInterval(() => {
+  // Memoize active deals to avoid recalculating every second
+  const activeTopDeals = useMemo(() => {
     const now = new Date();
-    const diff = endTime - now;
+    return (
+      topDeals?.filter((product) => {
+        if (!product.isTopDeal) return false;
+        const start = product.topDealStart
+          ? new Date(product.topDealStart)
+          : null;
+        const end = product.topDealEnd ? new Date(product.topDealEnd) : null;
 
+        // Check if deal is currently active (between start and end)
+        if (start && end) {
+          return now >= start && now <= end;
+        }
+        return false;
+      }) || []
+    );
+  }, [topDeals]);
+
+  // Memoize earliest end time among active deals
+  const earliestEndTime = useMemo(() => {
+    if (activeTopDeals.length === 0) return null;
+
+    const endTimes = activeTopDeals
+      .map((product) =>
+        product.topDealEnd ? new Date(product.topDealEnd) : null,
+      )
+      .filter((date) => date !== null);
+
+    return endTimes.length > 0 ? new Date(Math.min(...endTimes)) : null;
+  }, [activeTopDeals]);
+
+  // Optimized countdown calculation
+  const calculateCountdown = useCallback(() => {
+    if (!earliestEndTime) {
+      setCountdown("");
+      return;
+    }
+
+    const now = new Date();
+    if (earliestEndTime <= now) {
+      setCountdown("");
+      return;
+    }
+
+    const diff = earliestEndTime - now;
     if (diff <= 0) {
-      clearInterval(timer);
       setCountdown("");
       return;
     }
@@ -71,13 +109,18 @@ useEffect(() => {
     const s = Math.floor((diff / 1000) % 60);
 
     setCountdown(
-      `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+      `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`,
     );
-  }, 1000);
+  }, [earliestEndTime]);
 
-  return () => clearInterval(timer);
-}, []);
+  useEffect(() => {
+    // Set up interval to update every second
+    const timer = setInterval(() => {
+      calculateCountdown();
+    }, 1000);
 
+    return () => clearInterval(timer);
+  }, [calculateCountdown]);
 
   useEffect(() => {
     if (status === "idle") dispatch(getAllCategories());
@@ -190,29 +233,35 @@ useEffect(() => {
       </section>
 
       {/* 4. FLASH DEALS / PRODUCTS SECTION */}
-      <section className="max-w-[1400px] mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b">
-            <div className="flex items-center gap-3">
-              <RiFlashlightFill className="text-yellow-500 text-2xl" />
-              <h2 className="text-xl font-bold text-gray-800">Top Deals</h2>
-              {countdown && (
-                <div className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-mono hidden md:block">
-                  {countdown}
-                </div>
-              )}
-            </div>
-            <button
-              onClick={() => navigate("/shop")}
-              className="bg-red-600 text-white text-sm px-4 py-1.5 rounded shadow hover:bg-red-700 transition"
-            >
-              View All
-            </button>
-          </div>
+      {topDeals?.length > 0 && (
+        <section className="max-w-[1400px] mx-auto px-4 py-8">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <div className="flex items-center gap-3">
+                <RiFlashlightFill className="text-yellow-500 text-2xl" />
+                <h2 className="text-xl font-bold text-gray-800">Top Deals</h2>
 
-          <div className="p-4">{loading ? <Loader /> : <Card products={topDeals} />}</div>
-        </div>
-      </section>
+                {countdown && (
+                  <div className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-mono hidden md:block">
+                    {countdown}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => navigate("/shop")}
+                className="bg-red-600 text-white text-sm px-4 py-1.5 rounded shadow hover:bg-red-700 transition"
+              >
+                View All
+              </button>
+            </div>
+
+            <div className="p-4">
+              {loading ? <Loader /> : <Card products={topDeals} />}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 5. ENHANCED PROMO GRID (Professional Marketplace Style) */}
       <section className="max-w-[1400px] mx-auto px-4 py-10">

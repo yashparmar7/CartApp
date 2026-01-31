@@ -156,9 +156,9 @@ const createProduct = async (req, res) => {
       delivery: parsedDelivery || undefined,
       status: "PENDING",
       isActive: false,
-      isTopDeal: isTopDeal === true || isTopDeal === "true" ? true : false,
-      topDealStart: isTopDeal ? topDealStart : null,
-      topDealEnd: isTopDeal ? topDealEnd : null,
+      isTopDeal: Boolean(isTopDeal),
+      topDealStart: isTopDeal ? new Date(topDealStart) : null,
+      topDealEnd: isTopDeal ? new Date(topDealEnd) : null,
     };
 
     if (images.length > 0) {
@@ -298,12 +298,12 @@ const updateProduct = async (req, res) => {
       status: "PENDING", // Always set to PENDING on edit
       // Only update isActive if provided in request
       ...(isActive !== undefined && {
-        isActive: isActive === true || isActive === "true",
+        isActive: Boolean(isActive),
       }),
       // Top Deal fields
-      isTopDeal: isTopDeal === true || isTopDeal === "true" ? true : false,
-      topDealStart: isTopDeal ? topDealStart : null,
-      topDealEnd: isTopDeal ? topDealEnd : null,
+      isTopDeal: Boolean(isTopDeal),
+      topDealStart: isTopDeal ? new Date(topDealStart) : null,
+      topDealEnd: isTopDeal ? new Date(topDealEnd) : null,
     };
 
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
