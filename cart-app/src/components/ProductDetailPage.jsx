@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   RiShoppingCartFill,
   RiHeartLine,
+  RiHeart3Fill,
   RiFlashlightFill,
   RiTruckLine,
   RiPriceTag3Fill,
@@ -13,6 +14,10 @@ import Navbar from "./Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleProduct } from "../features/product/productSlice";
 import { addToCart } from "../features/cart/cartSlice";
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../features/wishlist/wishlistSlice";
 import { selectIsAuthenticated } from "../features/auth/authSlice";
 import { useParams, useNavigate } from "react-router-dom";
 import Loader from "./Loader";
@@ -28,6 +33,7 @@ const ProductDetailPage = () => {
   const { singleProduct, loading, error } = useSelector(
     (state) => state.product,
   );
+  const { wishlist } = useSelector((state) => state.wishlist);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
@@ -51,12 +57,43 @@ const ProductDetailPage = () => {
       .catch((err) => toast.error(err?.message || "Failed to add to cart"));
   };
 
+  const isInWishlist = wishlist.some(
+    (item) => item.product._id === singleProduct._id,
+  );
+
+  const handleAddToWishlist = (id) => {
+    if (!isAuthenticated) {
+      toast.error("Please login to continue");
+      return;
+    }
+    if (isInWishlist) {
+      dispatch(removeFromWishlist({ productId: id }))
+        .unwrap()
+        .then((res) => toast.success(res.message))
+        .catch((err) =>
+          toast.error(err?.message || "Failed to remove from wishlist"),
+        );
+    } else {
+      dispatch(addToWishlist({ productId: id }))
+        .unwrap()
+        .then((res) => toast.success(res.message))
+        .catch((err) =>
+          toast.error(err?.message || "Failed to add to wishlist"),
+        );
+    }
+  };
   const handleBuyNow = () => {
     if (!isAuthenticated) {
       toast.error("Please login to continue");
       return;
     }
-    navigate("/cart");
+    dispatch(addToCart({ productId: id }))
+      .unwrap()
+      .then((res) => {
+        toast.success(res.message);
+        navigate("/checkout");
+      })
+      .catch((err) => toast.error(err?.message || "Failed to add to cart"));
   };
 
   if (loading) return <Loader />;
@@ -106,8 +143,15 @@ const ProductDetailPage = () => {
                   alt={singleProduct.title}
                   className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-110"
                 />
-                <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full shadow-md text-gray-600 hover:text-red-500 transition">
-                  <RiHeartLine size={20} />
+                <button
+                  className={`absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full shadow-md transition ${isInWishlist ? "text-red-500" : "text-gray-600 hover:text-red-500"}`}
+                  onClick={() => handleAddToWishlist(singleProduct._id)}
+                >
+                  {isInWishlist ? (
+                    <RiHeart3Fill size={20} />
+                  ) : (
+                    <RiHeartLine size={20} />
+                  )}
                 </button>
               </div>
 

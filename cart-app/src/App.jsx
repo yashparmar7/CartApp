@@ -15,6 +15,7 @@ import HomePage from "./Pages/User/HomePage";
 import SignupPage from "./Pages/User/SignupPage";
 import LoginPage from "./Pages/User/LoginPage";
 import CartPage from "./Pages/User/CartPage";
+import WishListPage from "./Pages/User/WishListPage";
 import ShopPage from "./Pages/User/ShopPage";
 import ContactPage from "./Pages/User/ContactPage";
 import AboutPage from "./Pages/User/AboutPage";
@@ -55,6 +56,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           {/* <Route path="/verify-email/:token" element={<VerifyEmail />} /> */}
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/wishlist" element={<WishListPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/my-orders" element={<MyOrderPage />} />

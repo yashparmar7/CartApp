@@ -218,13 +218,13 @@ const ShopPage = () => {
       return true;
     });
 
-    console.log(
-      products.map((p) => ({
-        title: p.title,
-        category: p.category,
-        price: p.pricing?.price,
-      })),
-    );
+    // console.log(
+    //   products.map((p) => ({
+    //     title: p.title,
+    //     category: p.category,
+    //     price: p.pricing?.price,
+    //   })),
+    // );
 
     // Sort products
     filtered.sort((a, b) => {

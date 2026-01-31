@@ -6,6 +6,8 @@ import {
   IoCloseOutline,
   IoPersonOutline,
   IoSearchOutline,
+  IoHeart,
+  IoHeartOutline,
 } from "react-icons/io5";
 import { HiOutlineLogout } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
@@ -146,6 +148,18 @@ const Navbar = () => {
                 className="relative group p-2 rounded-full hover:bg-gray-50 transition"
               >
                 <IoCartOutline className="w-7 h-7 text-gray-700 group-hover:text-red-500" />
+                {cart?.length > 0 && (
+                  <span className="absolute top-1 right-1 bg-red-600 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                    {cart.length}
+                  </span>
+                )}
+              </Link>
+
+              <Link
+                to="/wishlist"
+                className="relative group p-2 rounded-full hover:bg-gray-50 transition"
+              >
+                <IoHeartOutline className="w-7 h-7 text-gray-700 group-hover:text-red-500" />
                 {cart?.length > 0 && (
                   <span className="absolute top-1 right-1 bg-red-600 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
                     {cart.length}

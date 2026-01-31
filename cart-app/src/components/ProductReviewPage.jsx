@@ -197,7 +197,6 @@ const ProductReviewPage = () => {
         </div>
       </div>
 
-      {/* ===================== TESTIMONIAL FEED ===================== */}
       <div className="space-y-6">
         <h3 className="text-[10px] font-bold text-gray-400 tracking-[0.2em] ml-2">
           Customer Reviews
@@ -258,7 +257,7 @@ const ProductReviewPage = () => {
               onClick={() => setVisibleCount(3)}
               className="px-8 py-3 border border-red-500 text-red-500 rounded-full text-sm font-bold hover:bg-red-50 transition"
             >
-              Show less
+              Show less reviews
             </button>
           </div>
         )}
