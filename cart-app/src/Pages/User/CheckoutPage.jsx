@@ -294,15 +294,14 @@ const CheckoutPage = () => {
                         </div>
                       )}
 
-                      {codAvailable && (
-                        <PaymentOption
-                          label="Cash on Delivery"
-                          sub="Pay when you receive the product"
-                          icon={<FaMoneyBillWave />}
-                          active={paymentMethod === "cod"}
-                          onClick={() => setPaymentMethod("cod")}
-                        />
-                      )}
+                      <PaymentOption
+                        label="Cash on Delivery"
+                        sub="Pay when you receive the product"
+                        icon={<FaMoneyBillWave />}
+                        active={paymentMethod === "cod"}
+                        disabled={!codAvailable}
+                        onClick={() => !codAvailable || setPaymentMethod("cod")}
+                      />
                     </div>
 
                     {errors.payment && (
@@ -412,23 +411,39 @@ const Input = ({ label, error, className = "", ...props }) => (
   </div>
 );
 
-const PaymentOption = ({ icon, label, sub, active, onClick }) => (
+const PaymentOption = ({
+  icon,
+  label,
+  sub,
+  active,
+  onClick,
+  disabled = false,
+}) => (
   <div
-    onClick={onClick}
-    className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300
-    ${active ? "border-red-500 bg-red-50" : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"}`}
+    onClick={disabled ? undefined : onClick}
+    className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-300
+    ${disabled ? "cursor-not-allowed opacity-50 bg-gray-50 border-gray-200" : "cursor-pointer"}
+    ${active ? "border-red-500 bg-red-50" : disabled ? "" : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"}`}
   >
     <div
-      className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${active ? "bg-red-500 text-white" : "bg-gray-100 text-gray-400"}`}
+      className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${active ? "bg-red-500 text-white" : disabled ? "bg-gray-200 text-gray-400" : "bg-gray-100 text-gray-400"}`}
     >
       {icon}
     </div>
     <div className="flex-1">
-      <p className="text-sm font-black text-gray-900 leading-tight">{label}</p>
-      <p className="text-[10px] text-gray-400 font-bold mt-0.5">{sub}</p>
+      <p
+        className={`text-sm font-black leading-tight ${disabled ? "text-gray-400" : "text-gray-900"}`}
+      >
+        {label}
+      </p>
+      <p
+        className={`text-[10px] font-bold mt-0.5 ${disabled ? "text-gray-300" : "text-gray-400"}`}
+      >
+        {sub}
+      </p>
     </div>
     <div
-      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${active ? "border-red-500" : "border-gray-300"}`}
+      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${active ? "border-red-500" : disabled ? "border-gray-200" : "border-gray-300"}`}
     >
       {active && <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>}
     </div>
