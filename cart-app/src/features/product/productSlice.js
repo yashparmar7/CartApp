@@ -139,16 +139,13 @@ export const createProduct = createAsyncThunk(
       fd.append("description", formData.description);
       fd.append("category", formData.category);
 
-      fd.append("price", formData.pricing.price);
-      fd.append("mrp", formData.pricing.mrp);
+      fd.append("pricing", JSON.stringify(formData.pricing));
 
       fd.append("stock", formData.stock);
 
-      fd.append("estimated", formData.delivery.estimated);
-      fd.append("cost", formData.delivery.cost);
-      fd.append("codAvailable", formData.delivery.codAvailable);
+      fd.append("delivery", JSON.stringify(formData.delivery));
 
-      fd.append("offers", formData.offers);
+      fd.append("offers", JSON.stringify(formData.offers));
 
       // Top Deal fields
       fd.append("isTopDeal", formData.isTopDeal || false);
@@ -185,16 +182,15 @@ export const updateProduct = createAsyncThunk(
       fd.append("description", formData.description);
       fd.append("category", formData.category);
 
-      fd.append("price", formData.pricing.price);
-      fd.append("mrp", formData.pricing.mrp);
+      fd.append("pricing", JSON.stringify(formData.pricing));
 
       fd.append("stock", formData.stock);
 
-      fd.append("estimated", formData.delivery.estimated);
-      fd.append("cost", formData.delivery.cost);
-      fd.append("codAvailable", formData.delivery.codAvailable);
+      fd.append("delivery", JSON.stringify(formData.delivery));
 
-      fd.append("offers", formData.offers);
+      fd.append("offers", JSON.stringify(formData.offers));
+
+      fd.append("isActive", formData.isActive);
 
       images.forEach((img) => {
         fd.append("images", img);

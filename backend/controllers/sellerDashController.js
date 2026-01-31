@@ -79,27 +79,50 @@ const createProduct = async (req, res) => {
       title,
       brand,
       description,
-      price,
-      mrp,
+      pricing,
       stock,
       category,
       offers,
       delivery,
+      isTopDeal,
+      topDealStart,
+      topDealEnd,
     } = req.body;
+
+    // Parse pricing if string
+    const parsedPricing =
+      typeof pricing === "string" ? JSON.parse(pricing) : pricing;
 
     if (
       !title ||
       !brand ||
       !description ||
-      price === "" ||
-      isNaN(Number(price)) ||
-      mrp === "" ||
-      isNaN(Number(mrp)) ||
+      !parsedPricing?.price ||
+      isNaN(Number(parsedPricing.price)) ||
+      !parsedPricing?.mrp ||
+      isNaN(Number(parsedPricing.mrp)) ||
       !category
     ) {
       return res.status(400).json({
         message: "Please provide all required fields with valid values",
       });
+    }
+
+    // Top Deal validation
+    if (isTopDeal === true || isTopDeal === "true") {
+      if (!topDealStart || !topDealEnd) {
+        return res.status(400).json({
+          message:
+            "Top Deal start and end times are required when marking as Top Deal",
+        });
+      }
+      const start = new Date(topDealStart);
+      const end = new Date(topDealEnd);
+      if (end <= start) {
+        return res.status(400).json({
+          message: "Top Deal end time must be greater than start time",
+        });
+      }
     }
 
     // images
@@ -112,7 +135,7 @@ const createProduct = async (req, res) => {
     const parsedOffers = Array.isArray(offers)
       ? offers
       : typeof offers === "string"
-        ? offers.split(",").map((o) => o.trim())
+        ? JSON.parse(offers)
         : [];
 
     const parsedDelivery =
@@ -124,8 +147,8 @@ const createProduct = async (req, res) => {
       description,
       seller: req.user._id,
       pricing: {
-        price: Number(price),
-        mrp: Number(mrp),
+        price: Number(parsedPricing.price),
+        mrp: Number(parsedPricing.mrp),
       },
       stock: Number(stock) || 0,
       category,
@@ -133,6 +156,9 @@ const createProduct = async (req, res) => {
       delivery: parsedDelivery || undefined,
       status: "PENDING",
       isActive: false,
+      isTopDeal: isTopDeal === true || isTopDeal === "true" ? true : false,
+      topDealStart: isTopDeal ? topDealStart : null,
+      topDealEnd: isTopDeal ? topDealEnd : null,
     };
 
     if (images.length > 0) {
@@ -160,8 +186,7 @@ const updateProduct = async (req, res) => {
       title,
       brand,
       description,
-      price,
-      mrp,
+      pricing,
       stock,
       category,
       offers,
@@ -169,16 +194,21 @@ const updateProduct = async (req, res) => {
       isTopDeal,
       topDealStart,
       topDealEnd,
+      isActive,
     } = req.body;
+
+    // Parse pricing if string
+    const parsedPricing =
+      typeof pricing === "string" ? JSON.parse(pricing) : pricing;
 
     if (
       !title ||
       !brand ||
       !description ||
-      price === "" ||
-      isNaN(Number(price)) ||
-      mrp === "" ||
-      isNaN(Number(mrp)) ||
+      !parsedPricing?.price ||
+      isNaN(Number(parsedPricing.price)) ||
+      !parsedPricing?.mrp ||
+      isNaN(Number(parsedPricing.mrp)) ||
       !category
     ) {
       return res.status(400).json({
@@ -212,10 +242,6 @@ const updateProduct = async (req, res) => {
           message: "Top Deal end time must be greater than start time",
         });
       }
-    } else if (isTopDeal === false || isTopDeal === "false") {
-      // Clear Top Deal dates if not a Top Deal
-      req.body.topDealStart = null;
-      req.body.topDealEnd = null;
     }
 
     // Handle images: remove specified images and append new ones
@@ -241,7 +267,7 @@ const updateProduct = async (req, res) => {
     const parsedOffers = Array.isArray(offers)
       ? offers
       : typeof offers === "string"
-        ? offers.split(",").map((o) => o.trim())
+        ? JSON.parse(offers)
         : existingProduct.offers;
 
     const parsedDelivery =
@@ -250,7 +276,9 @@ const updateProduct = async (req, res) => {
         : delivery || existingProduct.delivery;
 
     const discount = Math.round(
-      ((Number(mrp) - Number(price)) / Number(mrp)) * 100,
+      ((Number(parsedPricing.mrp) - Number(parsedPricing.price)) /
+        Number(parsedPricing.mrp)) *
+        100,
     );
 
     const updateData = {
@@ -258,8 +286,8 @@ const updateProduct = async (req, res) => {
       brand,
       description,
       pricing: {
-        price: Number(price),
-        mrp: Number(mrp),
+        price: Number(parsedPricing.price),
+        mrp: Number(parsedPricing.mrp),
         discountPercentage: discount,
       },
       stock: Number(stock) || existingProduct.stock,
@@ -267,8 +295,11 @@ const updateProduct = async (req, res) => {
       offers: parsedOffers,
       delivery: parsedDelivery,
       image: updatedImages,
-      status: "PENDING",
-      isActive: false,
+      status: "PENDING", // Always set to PENDING on edit
+      // Only update isActive if provided in request
+      ...(isActive !== undefined && {
+        isActive: isActive === true || isActive === "true",
+      }),
       // Top Deal fields
       isTopDeal: isTopDeal === true || isTopDeal === "true" ? true : false,
       topDealStart: isTopDeal ? topDealStart : null,

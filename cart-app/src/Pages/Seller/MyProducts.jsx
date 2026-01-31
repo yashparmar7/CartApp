@@ -113,7 +113,7 @@ const MyProducts = () => {
       codAvailable: true,
     },
 
-    offers: "",
+    offers: [],
 
     // Top Deal fields
     isTopDeal: false,
@@ -905,9 +905,12 @@ const MyProducts = () => {
 
                 <InputGroup label="Exclusive Offers">
                   <input
-                    value={formData.offers}
+                    value={formData.offers.join(", ")}
                     onChange={(e) =>
-                      setFormData({ ...formData, offers: e.target.value })
+                      setFormData({
+                        ...formData,
+                        offers: e.target.value.split(",").map((o) => o.trim()),
+                      })
                     }
                     placeholder="e.g. Free shipping, Festival offer"
                     className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-white font-bold text-sm outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all shadow-sm"
