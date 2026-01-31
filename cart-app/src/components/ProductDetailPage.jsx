@@ -17,6 +17,7 @@ import { addToCart } from "../features/cart/cartSlice";
 import {
   addToWishlist,
   removeFromWishlist,
+  getWishlist,
 } from "../features/wishlist/wishlistSlice";
 import { selectIsAuthenticated } from "../features/auth/authSlice";
 import { useParams, useNavigate } from "react-router-dom";
@@ -39,6 +40,12 @@ const ProductDetailPage = () => {
   useEffect(() => {
     if (id) dispatch(getSingleProduct(id));
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getWishlist());
+    }
+  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
     if (singleProduct?.image?.length > 0) {
@@ -239,16 +246,19 @@ const ProductDetailPage = () => {
                   Available Offers
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {singleProduct.offers?.length > 0 ? (
-                    singleProduct.offers.map((offer, index) => (
-                      <div
-                        key={index}
-                        className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white"
-                      >
-                        <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />
-                        <p className="text-xs text-gray-700">{offer}</p>
-                      </div>
-                    ))
+                  {singleProduct.offers?.filter((offer) => offer.trim() !== "")
+                    .length > 0 ? (
+                    singleProduct.offers
+                      .filter((offer) => offer.trim() !== "")
+                      .map((offer, index) => (
+                        <div
+                          key={index}
+                          className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white"
+                        >
+                          <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />
+                          <p className="text-xs text-gray-700">{offer}</p>
+                        </div>
+                      ))
                   ) : (
                     <div className="flex gap-3 p-3 border border-dashed border-red-200 rounded-lg bg-white">
                       <RiPriceTag3Fill className="text-red-500 shrink-0 mt-1" />

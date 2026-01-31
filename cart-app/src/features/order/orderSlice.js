@@ -8,19 +8,21 @@ import {
   cancelOrderAPI,
   getSellerOrdersAPI,
 } from "./orderAPI";
+import { getCart } from "../cart/cartSlice";
 
 export const createOrder = createAsyncThunk(
   "order/createOrder",
-  async (data, { rejectWithValue }) => {
+  async (data, { rejectWithValue, dispatch }) => {
     try {
       const res = await createOrderAPI(data);
+      dispatch(getCart());
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to create order"
+        err.response?.data?.message || "Failed to create order",
       );
     }
-  }
+  },
 );
 
 export const getAllOrders = createAsyncThunk(
@@ -31,10 +33,10 @@ export const getAllOrders = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to get orders"
+        err.response?.data?.message || "Failed to get orders",
       );
     }
-  }
+  },
 );
 
 export const updateOrder = createAsyncThunk(
@@ -45,10 +47,10 @@ export const updateOrder = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to update order"
+        err.response?.data?.message || "Failed to update order",
       );
     }
-  }
+  },
 );
 
 export const deleteOrder = createAsyncThunk(
@@ -59,10 +61,10 @@ export const deleteOrder = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to delete order"
+        err.response?.data?.message || "Failed to delete order",
       );
     }
-  }
+  },
 );
 
 export const getUserOrders = createAsyncThunk(
@@ -73,10 +75,10 @@ export const getUserOrders = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to get user orders"
+        err.response?.data?.message || "Failed to get user orders",
       );
     }
-  }
+  },
 );
 
 export const cancelOrder = createAsyncThunk(
@@ -87,10 +89,10 @@ export const cancelOrder = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to cancel order"
+        err.response?.data?.message || "Failed to cancel order",
       );
     }
-  }
+  },
 );
 
 export const getSellerOrders = createAsyncThunk(
@@ -101,10 +103,10 @@ export const getSellerOrders = createAsyncThunk(
       return res.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to get seller orders"
+        err.response?.data?.message || "Failed to get seller orders",
       );
     }
-  }
+  },
 );
 
 const orderSlice = createSlice({

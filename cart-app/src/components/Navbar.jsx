@@ -24,6 +24,7 @@ const Navbar = () => {
 
   const { user } = useSelector((state) => state.auth);
   const { cart } = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
 
   const handleLogout = () => {
     dispatch(logoutAsync());
@@ -160,9 +161,9 @@ const Navbar = () => {
                 className="relative group p-2 rounded-full hover:bg-gray-50 transition"
               >
                 <IoHeartOutline className="w-7 h-7 text-gray-700 group-hover:text-red-500" />
-                {cart?.length > 0 && (
+                {wishlist?.length > 0 && (
                   <span className="absolute top-1 right-1 bg-red-600 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
-                    {cart.length}
+                    {wishlist.length}
                   </span>
                 )}
               </Link>

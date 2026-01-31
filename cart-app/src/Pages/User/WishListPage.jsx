@@ -55,42 +55,40 @@ const WishListPage = () => {
 
           <Link
             to="/shop"
-            className="group flex items-center gap-2 text-[10px] font-bold  tracking-widest text-gray-400 hover:text-red-500 transition-all"
+            className="group flex items-center gap-2 text-[12px] font-bold  tracking-widest text-gray-400 hover:text-red-500 transition-all"
           >
             Continue Shopping{" "}
             <RiArrowRightUpLine className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </Link>
         </div>
 
-        {/* ===================== CONTENT AREA ===================== */}
         {!loading && wishlist.length === 0 ? (
-          /* EMPTY STATE */
           <div className="bg-white rounded-[3rem] border border-dashed border-gray-200 p-20 text-center shadow-sm">
             <div className="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-gray-200 border border-gray-100">
               <RiShoppingBag3Fill size={48} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900  tracking-tight">
-              Registry is Empty
+              Your wishlist is empty
             </h2>
             <p className="text-gray-400 mt-3 mb-10 text-sm font-medium ">
-              Your saved inventory manifest is currently unpopulated.
+              Your saved items will appear here once you add them to your
+              wishlist.
             </p>
             <button
               onClick={() => navigate("/shop")}
               className="inline-flex items-center gap-3 bg-gray-900 text-white px-10 py-4 rounded-2xl font-bold text-xs  tracking-widest hover:bg-red-500 transition-all shadow-xl shadow-gray-200 active:scale-95"
             >
-              Access Global Catalog
+              <RiShoppingCart2Fill size={20} />
+              Shop Now
             </button>
           </div>
         ) : (
-          /* WISHLIST GRID */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {wishlist.map((item) => (
               <div
                 key={item.product._id}
                 className="group relative bg-white rounded-[2.5rem] p-5 border border-gray-100 hover:shadow-2xl hover:shadow-red-500/5 transition-all duration-500 hover:-translate-y-2 flex flex-col"
               >
-                {/* Image Interface */}
                 <div
                   onClick={() => navigate(`/product/${item.product._id}`)}
                   className="relative h-56 bg-[#F9FAFB] rounded-[2rem] overflow-hidden flex items-center justify-center p-8 cursor-pointer group-hover:bg-white transition-colors"

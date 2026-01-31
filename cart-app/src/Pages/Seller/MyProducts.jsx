@@ -1231,6 +1231,63 @@ const MyProducts = () => {
                     className="form-input-premium font-bold"
                   />
                 </InputGroup>
+
+                <InputGroup label="Offers (comma separated)">
+                  <input
+                    type="text"
+                    value={selectedProduct.offers?.join(", ") || ""}
+                    onChange={(e) =>
+                      setSelectedProduct({
+                        ...selectedProduct,
+                        offers: e.target.value.split(",").map((o) => o.trim()),
+                      })
+                    }
+                    className="form-input-premium font-black"
+                    placeholder="Free delivery, Festival offer"
+                  />
+                </InputGroup>
+              </div>
+
+              <div
+                onClick={() =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    delivery: {
+                      ...selectedProduct.delivery,
+                      codAvailable: !selectedProduct.delivery?.codAvailable,
+                    },
+                  })
+                }
+                className="flex items-center justify-between p-5 rounded-2xl border border-gray-100 bg-white cursor-pointer hover:bg-red-50/50 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <RiHandCoinFill
+                    className={`text-xl ${
+                      selectedProduct.delivery?.codAvailable
+                        ? "text-red-500"
+                        : "text-gray-300"
+                    }`}
+                  />
+                  <p className="text-xs font-black text-gray-900 uppercase tracking-tight">
+                    Cash on Delivery
+                  </p>
+                </div>
+
+                <div
+                  className={`w-10 h-5 rounded-full relative transition-colors ${
+                    selectedProduct.delivery?.codAvailable
+                      ? "bg-red-500"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  <div
+                    className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${
+                      selectedProduct.delivery?.codAvailable
+                        ? "left-6"
+                        : "left-1"
+                    }`}
+                  />
+                </div>
               </div>
 
               {/* SECTION 3: PROMOTIONS (TOP DEAL) */}
